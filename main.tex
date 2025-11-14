@@ -13,8 +13,6 @@
 \usepackage{booktabs}
 \usepackage{array}
 \usepackage{subcaption} % Permite crear subfiguras
-\usepackage[table]{xcolor}
-\usepackage{colortbl}
 \usepackage{comment} 
 \usepackage{graphicx}
 \usepackage{svg}
@@ -76,57 +74,10 @@ De este modo, se ha fortalecido la estructura metodológica del proyecto, incluy
 
 Aunque los modelos analizados hasta ahora ofrecen una base interesante para abordar el problema, aún se requiere un trabajo más profundo tanto en la experimentación como en la integración de múltiples enfoques para abordar de forma más robusta las condiciones reales del entorno. Estos avances metodológicos y conceptuales constituyen una base sólida para continuar con las siguientes fases del proyecto.
 
-
-
 % Referencias
 \newpage
 \bibliographystyle{plainnat}
 \bibliography{referencias}
 \addcontentsline{toc}{section}{Referencias}
-
-\newpage
-\section{Cronograma}
-\begin{table}[h!]
-\centering
-\begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}p{4cm}|*{11}{>{\centering\arraybackslash}X|}}
-\hline
-\rowcolor{gray!20}
-\textbf{ACTIVIDAD} & \textbf{F} & \textbf{M} & \textbf{A} & \textbf{M} & \textbf{J} & \textbf{J} & \textbf{A} & \textbf{S} & \textbf{O} & \textbf{N} & \textbf{D} \\
-\hline
-Investigación documental & \cellcolor{green!30} & \cellcolor{green!30} & \cellcolor{green!30} & \cellcolor{green!30} & & & & & & & \\
-\hline
-Pruebas del estado del arte & & \cellcolor{green!30} & \cellcolor{green!30} & \cellcolor{green!30} & & & & & & & \\
-\hline
-Captura y recolección de datos & & & \cellcolor{green!30} & \cellcolor{green!30} & \cellcolor{gray!30} & & & & & & \\
-\hline
-Selección de algoritmos a utilizar & & & & \cellcolor{green!30} & \cellcolor{gray!30} & & & & & & \\
-\hline
-Propuestas de modificaciones & & & & & \cellcolor{gray!30} & \cellcolor{gray!30} & & & & & \\
-\hline
-Implementación de modificaciones e integración & & & & & \cellcolor{gray!30} & \cellcolor{gray!30} & \cellcolor{gray!30} & & & & \\
-\hline
-Pruebas y evaluación          & & & & & & & \cellcolor{gray!30} & \cellcolor{gray!30} & & & \\
-\hline
-Análisis de resultados         & & & & & & & & \cellcolor{gray!30} & \cellcolor{gray!30} & & \\
-\hline
-Documentación y redacción de reporte técnico & & & & & & & & \cellcolor{gray!30} & \cellcolor{gray!30} & \cellcolor{gray!30} & \cellcolor{gray!30} \\
-\hline
-\end{tabularx}
-\caption{Cronograma de actividades con marcación por mes}
-\end{table}
-
-
-
-\begin{comment}
-% Anexos
-\newpage
-\appendix
-\section{Anexo A}
-Material adicional aquí.
-
-\section{Anexo B}
-Más material adicional.
-\end{comment}
-
 
 \end{document}

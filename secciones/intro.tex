@@ -1,0 +1,118 @@
+\section{Introducción}
+\label{cap-intro}
+
+% Sección en edición, próximamente disponible
+
+La estimación de distancias es fundamental para el funcionamiento seguro y eficiente de sistemas móviles y autónomos, como vehículos autónomos, robots móviles y asistentes personales, y se realiza tradicionalmente mediante sistemas de imágenes estéreo, multicámara o mediciones LiDAR. Sin embargo, estos enfoques presentan limitaciones en términos de costo, casos de uso, sincronización, complejidad de equipamiento y consumo energético \cite{agand2024dmode}.  En contraste, la visión monocular, potenciada por avances en aprendizaje profundo, ha emergido como una alternativa viable y más accesible, permitiendo la estimación de profundidad a partir de una única imagen RGB . \cite{zhao2020monocular}.\\
+En la actualidad, los avances en visión computacional monocular han permitido desarrollar sistemas capaces de interpretar información visual de manera automatizada. Se han realizado estudios sobre la estimación de distancias entre vehículos \cite{zhe2020distance}, así como otros que amplían el análisis a múltiples objetos y entornos, aunque todavía se basan en perspectivas vehículares \cite{zhu2019objectdistance}. También existen enfoques basados en análisis geométrico que pueden escalarse a distintos objetos y escenarios \cite{shi2021geometry}. Sin embargo, a pesar de los avances y los buenos resultados obtenidos, los videos y conjuntos de datos utilizados siguen predominando en contextos de movimiento y captura vehicular, destacando el conjunto de datos de detección de objetos KITTI \cite{geiger2013kitti}, que fue recopilado desde una camioneta.\\
+En este contexto, el proyecto desarrolla y valida un sistema de estimación de distancias a partir de video monocular filmado desde la perspectiva de un peatón, integrando un enfoque geométrico que aprovecha la altura real de los sujetos y los parámetros intrínsecos de la cámara, a partir de los cuales se construyó un conjunto de datos propio; el análisis estadístico de esas mediciones mostró que características visuales como la altura en píxeles y la coordenada vertical del centro del cuadro envolvente de cada persona correlacionan de manera consistente con la distancia real, lo cual orientó la selección de entradas del modelo. Sobre esa base se diseñó y entrenó una arquitectura recurrente para realizar regresión de distancia en secuencias temporales, y se integró un detector YOLOv8 —sin reentrenamiento— para localizar peatones en cada cuadro y alimentar el sistema. Los resultados experimentales, muestran la capacidad del enfoque para generalizar a personas de alturas variables en escenarios dinámicos y establecen las métricas de error y limitaciones que guían futuras mejoras.   
+
+\subsection{Antecedentes}
+
+\begin{table}[H]
+\centering
+\footnotesize  % Tamaño de fuente más pequeño
+\setlength{\tabcolsep}{4pt}  % 
+\begin{tabular}{|p{2.8cm}|p{2.6cm}|p{2.4cm}|p{2.8cm}|p{2.8cm}|}
+\hline
+\textbf{Artículo} & \textbf{Método} & \textbf{Métricas de desempeño} & \textbf{Contribución principal} & \textbf{Limitaciones} \\
+\hline
+\textbf{Liang et al. (2022)} \newline 
+\textit{Self-Supervised Object Distance Estimation Using a Monocular Camera} & 
+YOLO + ShuffleNet con aprendizaje auto-supervisado & 
+Evaluado en KITTI; mejora en estimación de distancia específica de objetos & 
+Integración eficiente de detección y estimación de distancia con calibración de cámara & 
+No se especifican métricas cuantitativas detalladas; validación limitada a ciertos escenarios \\
+\hline
+\textbf{Zhu et al. (2019)} \newline 
+\textit{Learning Object-Specific Distance from a Monocular Image} & 
+YOLOv5 + Autoencoder con pérdida de proyección & 
+RMSE: 6.870 \newline AbsRel: 0.251  & 
+Primer modelo de aprendizaje profundo de extremo a extremo para distancias específicas de objetos & 
+Alto consumo computacional; rendimiento decreciente en escenas con curvas o pendientes pronunciadas \\
+\hline
+\textbf{Masoumian et al. (2021)} \newline 
+\textit{Absolute Distance Prediction Based on Deep Learning Object Detection and Monocular Depth Estimation Models} & 
+YOLOv5 + Autoencoder con pérdidas geométricas & 
+Precisión: 96\% \newline RMSE: 0.203 & 
+Mejora precisión en entornos complejos mediante enfoque en objetos detectados & 
+No aborda interacciones dinámicas cámara-objetos; validación en escenas estáticas \\
+\hline
+\textbf{Magaña et al. (2017)} \newline 
+\textit{Estimación de la Distancia a un Objeto con Visión Computacional} & 
+Sistema auto-supervisado (detección + calibración monocular + multi-escala) & 
+Error: 0.99\% \newline $\sigma$: 0.1\% \newline Éxito: 96.1\% & 
+Bajo consumo computacional y adaptabilidad en escenarios dinámicos & 
+Limitado en escenas con movimiento impredecible o alta oclusión \\
+\hline
+\end{tabular}
+\caption{Comparativa de trabajos relacionados en estimación de distancia con cámara monocular.}
+\label{tab:estimacion_distancia}
+\end{table}
+
+En los últimos años, la visión computacional monocular ha experimentado avances notables en la comprensión tridimensional de escenas. La estimación de profundidad a partir de una sola imagen ha sido el enfoque predominante para inferir la estructura espacial del entorno. Sin embargo, es crucial distinguir entre la estimación de profundidad y la estimación de distancias: mientras que la primera busca reconstruir un mapa de profundidad de la escena, la segunda se centra en calcular la separación métrica entre la cámara y objetos específicos, lo cual es esencial para tareas como la navegación autónoma y la prevención de colisiones.\\
+Frente a este panorama, diversos estudios recientes han abordado el problema de la estimación de distancias desde una perspectiva orientada a objetos, explorando enfoques que combinan detección y percepción espacial a partir de imágenes monoculares. Por ejemplo, en \cite{liang2022self} se propone un algoritmo basado en geometría y visión artificial que estima la distancia entre un robot y un objeto específico, alcanzando un error promedio inferior a 10 cm en entornos controlados. De forma complementaria, \cite{zhu2019monocular} introduce una arquitectura de aprendizaje profundo que fusiona detección mediante YOLOv5 y mapas de profundidad relativa obtenidos con un autoencoder, logrando una tasa de error del 5.3\% en condiciones reales al aire libre. Por otro lado, \cite{masoumian2023absolute} plantea una red de aprendizaje profundo de extremo a extremo con funciones de pérdida geométrica, que mejora la precisión en escenas complejas hasta en un 18\% respecto a métodos tradicionales. Estos trabajos evidencian avances notables en precisión y eficiencia en la estimación de distancias orientada a objetos en visión monocular.\\
+Sin embargo, un aspecto que permanece poco explorado en la mayoría de estos enfoques es la dinámica de la escena, particularmente la interacción entre el movimiento de la cámara y el de los objetos dentro de entornos cambiantes. Aunque \cite{magana2017estimacion} introduce un sistema auto-supervisado eficiente con bajo consumo computacional y buena adaptabilidad, su desempeño se ve limitado cuando se enfrenta a condiciones no estáticas.
+
+\subsection{Planteamiento del problema}
+
+\subsubsection{Definición del problema}
+
+Las tecnologías como LiDAR y las cámaras estéreo son reconocidas por su alta precisión en la estimación de distancias. Sin embargo, presentan desafíos significativos en términos de costo, tamaño y consumo energético, lo que limita su implementación en dispositivos portátiles o de bajo costo. Por ejemplo, el uso de LiDAR en aplicaciones como la conducción autónoma es común debido a su precisión, pero su alto costo y complejidad técnica dificultan su adopción en soluciones más accesibles \cite{yang2023train}.\\
+Gran parte de los estudios actuales en estimación de profundidad y detección de objetos se desarrollan sobre escenarios vehiculares, utilizando conjuntos de datos como KITTI, Cityscapes o nuScenes, todos recolectados desde vehículos en movimiento y orientados a aplicaciones de conducción autónoma \cite{niu2021monocular}. Esta concentración en contextos vehiculares limita la generalización de los modelos a otros escenarios como los entornos peatonales o interiores, donde las dinámicas de movimiento y los objetos en escena difieren significativamente. Incluso en conjuntos como DIODE, que incluye escenas interiores, se privilegian escenarios estáticos o controlados \cite{li2024synthetic}.\\
+En contraste, la visión computacional monocular, al usar únicamente una cámara para estimar las distancias y desplazamientos, se perfila como una alternativa más accesible frente a tecnologías más complejas. Sin embargo, aún presenta retos importantes. Las soluciones que proponen métodos de estimación no supervisados presentan deficiencias como ambigüedad de escala y rendimiento limitado debido a restricciones geométricas y a la falta de una verdad fundamental de referencia \cite{wan2022multi}.\\
+En el caso del aprendizaje supervisado, se han utilizado métodos basados en secuencias temporales de imágenes para estimar la posición y orientación de la cámara mediante redes convolucionales recurrentes, como en DistanceNet \cite{kreuzig2019distancenet}.  % Colocar referencia
+Sin embargo, la estimación de profundidad monocular continúa enfrentando limitaciones de generalización, especialmente cuando existen variaciones en los parámetros intrínsecos de la cámara, la resolución o el preprocesamiento de las imágenes. Estudios recientes demuestran que los modelos entrenados bajo configuraciones de cámara específicas tienden a degradar su rendimiento al aplicarse en dominios con características ópticas o de captura distintas \cite{koledic2023invariant}. % Colocar referencia 
+Incluso los métodos actuales de estado del arte que integran ajustes para estimación métrica absoluta, evidencian discrepancias métricas notables cuando se evalúan con cámaras o resoluciones distintas a las utilizadas durante su entrenamiento. Estos resultados destacan la relevancia de adaptar los modelos de estimación de distancia a las propiedades particulares de la cámara empleada —incluyendo su resolución, parámetros intrínsecos y de preprocesamiento— para lograr una estimación métrica consistente.
+
+\subsubsection{Objetivos}
+
+\textbf{Objetivo general}\\
+Evaluar la eficacia de un sistema de estimación de distancias en entornos dinámicos, basado en visión computacional monocular y técnicas de aprendizaje profundo, desarrollado a partir de la integración de distintos enfoques de modelado, detección y análisis secuencial de información visual, con el fin de determinar su precisión y aplicabilidad en contextos peatonales.\\
+
+\textbf{Objetivos específicos}
+\begin{itemize}
+    \item Generar un conjunto de datos propio compuesto por secuencias de video capturadas desde la perspectiva de un peatón, que sirviera como base para el entrenamiento, validación y análisis del sistema propuesto.
+    \item Integrar y ajustar componentes de detección, seguimiento y estimación de distancia dentro de un marco de visión monocular, considerando la influencia del movimiento tanto de la cámara como de los objetos presentes en la escena.
+    \item Analizar el rendimiento del sistema desarrollado mediante métricas cuantitativas (\textit{AbsRel}, \textit{RMSE} y \textit{threshold accuracy}) y la comparación de resultados frente a valores de referencia obtenidos experimentalmente.
+\end{itemize}
+
+\subsubsection{Justificación}
+
+La detección y estimación de distancias de objetos en entornos dinámicos es fundamental para mejorar la seguridad y la eficiencia de sistemas móviles. Aunque existen soluciones basadas en sensores especializados como LiDAR o sistemas estéreo, estos suelen implicar un costo elevado, mayor consumo energético y limitaciones de integración en dispositivos ligeros. Por otro lado, las metodologías puramente monoculares ofrecen una alternativa más accesible, aunque presentan dificultades para obtener estimaciones métricas precisas, especialmente cuando la cámara se encuentra en movimiento y las condiciones de captura difieren de las utilizadas durante el entrenamiento de los modelos.\\
+En este sentido, en el trabajo presente se propone abordar dicha brecha mediante \begin{enumerate}
+    \item la captura y anotación de un dataset propio, recolectado con la cámara y resolución reales del sistema objetivo
+    \item el entrenamiento supervisado de una arquitectura recurrente híbrida diseñada para explotar dependencias temporales y aprender una transformación hacia una escala métrica ajustada a nuestras condiciones de captura.
+\end{enumerate}
+Con ello se busca analizar hasta qué punto un enfoque supervisado y adaptado al dominio específico de la cámara puede mejorar la coherencia métrica frente a modelos genéricos entrenados en otros dominios o a aproximaciones auto-supervisadas no ajustadas.
+
+\subsection{Hipótesis}
+
+La estimación inicial de distancias, obtenida a partir de los parámetros intrínsecos de la cámara y de características observables de los sujetos en el entorno, permite establecer una aproximación métrica que sirve como base para el entrenamiento supervisado de una arquitectura recurrente híbrida. Se plantea que, al incorporar dependencias temporales presentes en las secuencias de video y aprovechar la variabilidad de altura entre los distintos sujetos, el modelo puede aprender una representación más generalizable y coherente de la escala métrica, mejorando la precisión de las estimaciones de distancia en escenas dinámicas capturadas con cámara monocular.
+
+\subsection{Aportación científica y/o tecnológica}
+
+ El presente trabajo plantea como aportación principal el desarrollo y validación de un modelo de percepción visual basado en visión computacional monocular, orientado a la estimación métrica absoluta de distancias a transeúntes en entornos dinámicos. A diferencia de enfoques genéricos entrenados en dominios externos o con sensores especializados, el sistema propuesto se construyó a partir de la captura y anotación de un dataset propio, grabado con la cámara y resolución reales del sistema objetivo, lo que permitió ajustar el modelo a las condiciones particulares de observación y movimiento.
+
+Como eje metodológico, el proyecto integra una etapa de estimación inicial basada en parámetros intrínsecos de la cámara y características físicas observables de los sujetos, seguida por un entrenamiento supervisado de una arquitectura recurrente híbrida (GRU–LSTM–GRU), diseñada para aprovechar la información temporal de las secuencias de video. Esta combinación permitió explorar el potencial de las redes recurrentes para refinar la coherencia métrica y mejorar la generalización del modelo ante personas de diferentes alturas y posiciones dentro de la escena.
+
+El trabajo constituye así una aportación tecnológica y experimental al demostrar la viabilidad de obtener estimaciones métricas de profundidad con una sola cámara, sin recurrir a sensores costosos como LiDAR o configuraciones estéreo.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{images/FDI1.png}
+    \caption{Esquema de funcionamiento}
+    \label{fig:blockDia}
+\end{figure}
+
+\subsection{Organización del proyecto técnico}
+%El presente proyecto técnico se estructura en cuatro capítulos principales. En el Capítulo \ref{cap-intro}, se expone la introducción general al tema, incluyendo los antecedentes, la definición del problema, los objetivos, la justificación, la hipótesis, así como la aportación científica y tecnológica esperada.\\
+
+El Capítulo \ref{cap-marcot} se desarrolla el marco teórico, donde se describen los fundamentos conceptuales relacionados con la visión computacional, los enfoques monoculares, la estimación de profundidad y sus retos, \begin{comment}
+    el movimiento desde la percepción de la cámara (ego-motion), la detección de objetos y el análisis de escenas dinámicas. Esta sección proporciona el contexto técnico y académico necesario para sustentar el desarrollo del proyecto.\\
+\end{comment}
+En el Capítulo \ref{cap-metodo}, se presenta la metodología propuesta implementada\begin{comment}
+    el sistema de detección de objetos y estimación de distancias, desglosando cada una de las etapas del proceso, desde la recolección de datos hasta la validación del sistema en escenarios dinámicos.\\
+\end{comment} 
+Capitulo de resultados 
+Finalmente, en el Capítulo \ref{cap-result} se incluirán las conclusiones obtenidas a partir del desarrollo del trabajo y la evaluación experimental, así como observaciones sobre posibles mejoras y aplicaciones futuras. El documento cierra con la sección de referencias que respalda el contenido técnico y científico del reporte.

@@ -1,0 +1,132 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{float} % en el preámbulo
+\usepackage{pdfpages}
+\usepackage[numbers]{natbib}
+\usepackage{subcaption}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{subcaption} % Permite crear subfiguras
+\usepackage[table]{xcolor}
+\usepackage{colortbl}
+\usepackage{comment} 
+\usepackage{graphicx}
+\usepackage{svg}
+\addto\captionsspanish{\renewcommand{\tablename}{Tabla}}
+
+
+
+
+
+\title{Estimación de distancias a transeúntes en entornos dinámicos mediante visión computacional monocular}
+\author{Castelan Rosete Marco A. \and Tapia Acosta Uriel}
+\date{\today}
+
+\begin{document}
+
+\begin{titlepage}
+  \thispagestyle{empty} % sin número de página
+  \includepdf[pages=1,offset=0 0,fitpaper=true]{portadaTT.pdf}
+\end{titlepage}
+
+\section*{Agradecimientos}
+
+
+\newpage
+
+\section*{Resumen}
+``En el presente proyecto se aborda el desarrollo de un sistema de estimación de distancias a transeúntes en entornos dinámicos mediante visión computacional monocular. A partir de imágenes capturadas desde la perspectiva de un peatón, se calcularon distancias reales aproximadas aplicando un modelo geométrico basado en las propiedades ópticas de la cámara y las dimensiones de los sujetos observados. Con estos datos se conformó un conjunto de entrenamiento que permitió ajustar una red neuronal recurrente (RNN) para la predicción de distancias en secuencias de video''. 
+
+\vspace{0.5cm}
+
+
+\textbf{Palabras clave:} Estimación de distancias, objetos dinámicos, visión computacional monocular, entornos urbanos. 
+
+\newpage
+
+% Índice
+\tableofcontents
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\input{secciones/intro}
+\newpage
+
+\input{secciones/marco_teorico}
+\newpage
+
+\newpage
+\input{secciones/metodologia}
+
+\newpage
+\input{secciones/resultados}
+
+\newpage
+\section{Conclusiones}
+Durante esta etapa del proyecto se ha avanzado en la exploración de modelos auto-supervisados de estimación de profundidad monocular. Estos modelos han permitido comprender mejor el funcionamiento y limitaciones de este tipo de enfoques, especialmente en lo relativo a la ambigüedad de escala y su comportamiento en entornos no controlados. Si bien han mostrado resultados prometedores en contextos específicos, también han evidenciado que la precisión de las estimaciones puede degradarse significativamente ante cambios de iluminación, geometría compleja o variaciones en la dinámica de la escena.
+
+De este modo, se ha fortalecido la estructura metodológica del proyecto, incluyendo la planificación para la generación de un dataset propio y la evaluación inicial de modelos de última generación como DepthAnything, cuya arquitectura y rendimiento lo posicionan como un candidato prometedor para el caso de estudio. Este modelo ha sido probado de manera preliminar, lo que ha permitido obtener una visión más clara sobre su potencial y sobre los desafíos que aún deben resolverse.
+
+Aunque los modelos analizados hasta ahora ofrecen una base interesante para abordar el problema, aún se requiere un trabajo más profundo tanto en la experimentación como en la integración de múltiples enfoques para abordar de forma más robusta las condiciones reales del entorno. Estos avances metodológicos y conceptuales constituyen una base sólida para continuar con las siguientes fases del proyecto.
+
+
+
+% Referencias
+\newpage
+\bibliographystyle{plainnat}
+\bibliography{referencias}
+\addcontentsline{toc}{section}{Referencias}
+
+\newpage
+\section{Cronograma}
+\begin{table}[h!]
+\centering
+\begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}p{4cm}|*{11}{>{\centering\arraybackslash}X|}}
+\hline
+\rowcolor{gray!20}
+\textbf{ACTIVIDAD} & \textbf{F} & \textbf{M} & \textbf{A} & \textbf{M} & \textbf{J} & \textbf{J} & \textbf{A} & \textbf{S} & \textbf{O} & \textbf{N} & \textbf{D} \\
+\hline
+Investigación documental & \cellcolor{green!30} & \cellcolor{green!30} & \cellcolor{green!30} & \cellcolor{green!30} & & & & & & & \\
+\hline
+Pruebas del estado del arte & & \cellcolor{green!30} & \cellcolor{green!30} & \cellcolor{green!30} & & & & & & & \\
+\hline
+Captura y recolección de datos & & & \cellcolor{green!30} & \cellcolor{green!30} & \cellcolor{gray!30} & & & & & & \\
+\hline
+Selección de algoritmos a utilizar & & & & \cellcolor{green!30} & \cellcolor{gray!30} & & & & & & \\
+\hline
+Propuestas de modificaciones & & & & & \cellcolor{gray!30} & \cellcolor{gray!30} & & & & & \\
+\hline
+Implementación de modificaciones e integración & & & & & \cellcolor{gray!30} & \cellcolor{gray!30} & \cellcolor{gray!30} & & & & \\
+\hline
+Pruebas y evaluación          & & & & & & & \cellcolor{gray!30} & \cellcolor{gray!30} & & & \\
+\hline
+Análisis de resultados         & & & & & & & & \cellcolor{gray!30} & \cellcolor{gray!30} & & \\
+\hline
+Documentación y redacción de reporte técnico & & & & & & & & \cellcolor{gray!30} & \cellcolor{gray!30} & \cellcolor{gray!30} & \cellcolor{gray!30} \\
+\hline
+\end{tabularx}
+\caption{Cronograma de actividades con marcación por mes}
+\end{table}
+
+
+
+\begin{comment}
+% Anexos
+\newpage
+\appendix
+\section{Anexo A}
+Material adicional aquí.
+
+\section{Anexo B}
+Más material adicional.
+\end{comment}
+
+
+\end{document}

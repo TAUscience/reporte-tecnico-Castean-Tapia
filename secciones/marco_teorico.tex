@@ -1,0 +1,99 @@
+\section{Marco Teórico}
+\label{cap-marcot}
+
+\subsection{Visión Computacional}
+La visión computacional es una rama de la inteligencia artificial que busca emular la capacidad humana de interpretar información visual del entorno mediante algoritmos capaces de procesar imágenes y extraer conocimiento significativo. Este campo ha evolucionado de manera considerable en las últimas décadas, impulsado por avances en el aprendizaje profundo y el procesamiento de grandes volúmenes de datos visuales.\\
+
+Desde un enfoque teórico, la visión computacional se fundamenta en principios de óptica, geometría proyectiva, aprendizaje automático y procesamiento de señales, disciplinas que en conjunto permiten modelar la relación entre el espacio tridimensional (3D) y su representación bidimensional (2D) en una imagen. Uno de los desafíos más relevantes es precisamente la recuperación de información tridimensional a partir de imágenes planas, lo cual constituye la base de tareas como la estimación de profundidad, reconstrucción 3D, localización y navegación autónoma.\\
+
+Entre los principales paradigmas se encuentran la visión computacional estereoscópica, que emplea múltiples cámaras para inferir profundidad mediante triangulación directa entre puntos correspondientes en distintas vistas, y la visión computacional monocular, que enfrenta el reto de estimar la estructura 3D del entorno a partir de una única imagen o secuencia de imágenes de una sola cámara.\\ Este último enfoque, aunque más desafiante debido a la ambigüedad inherente en la proyección 2D, resulta especialmente atractivo por su bajo costo computacional y de hardware, y es el foco principal del presente trabajo. 
+
+% Ambas subsecciones deberían ser una sola (Visión computacional + monocular deberían describir lo mismo)
+
+\subsubsection{Visión Monocular}
+
+La visión monocular se fundamenta en principios geométricos que permiten inferir información tridimensional a partir de proyecciones bidimensionales. En este contexto, la \textit{geometría proyectiva} proporciona el marco matemático que describe la formación de imágenes mediante una cámara, estableciendo cómo los puntos del espacio tridimensional se transforman en coordenadas del plano imagen. A diferencia de la geometría euclidiana, la geometría proyectiva no preserva distancias ni ángulos, sino relaciones de incidencia y proporciones invariantes, lo que la hace adecuada para modelar los efectos de la proyección perspectiva \cite{birchfield1998projective}.
+
+El modelo más utilizado para representar este proceso es el modelo de \textit{cámara estenopeica} (o \textit{pinhole camera model}), el cual asume una lente ideal que proyecta los rayos de luz a través de un punto denominado \textit{centro óptico} sobre un plano imagen situado a una distancia focal $f$. Bajo este modelo, la proyección de un punto del espacio $P = (X, Y, Z)$ en coordenadas del mundo hacia un punto $p = (x, y)$ en el plano imagen se describe mediante la semejanza de triángulos \cite{szeliski2022computer}:
+
+\begin{equation}
+    \frac{x}{X} = \frac{f}{Z}, \quad \frac{y}{Y} = \frac{f}{Z}.
+    \label{eq:pinhole}
+\end{equation}
+
+De esta relación se obtiene la transformación perspectiva directa:
+
+\begin{equation}
+    x = f \frac{X}{Z}, \quad y = f \frac{Y}{Z},
+    \label{eq:projection_basic}
+\end{equation}
+
+la cual refleja que la proyección de un punto en el plano imagen depende de la razón entre su posición en el espacio y su profundidad $Z$. En términos geométricos, esto significa que, a medida que un objeto se aleja de la cámara (aumenta $Z$), su tamaño proyectado en la imagen disminuye de forma inversamente proporcional.
+
+A partir de esta formulación se deriva una relación fundamental entre la distancia al objeto y su tamaño aparente. Considerando un objeto de altura real $H$ cuya proyección en la imagen tiene una altura $h$, se cumple la siguiente proporción \cite{shi2021geometry}:
+
+\begin{equation}
+    \frac{h}{f} = \frac{H}{Z} \quad \Rightarrow \quad Z = f \frac{H}{h}.
+    \label{eq:distance_relation}
+\end{equation}
+
+Esta expresión constituye la base de la estimación de distancia mediante visión monocular, ya que permite inferir la profundidad $Z$ a partir del tamaño proyectado $h$, siempre que se conozca la distancia focal $f$ de la cámara y la altura real $H$ del objeto. En sistemas digitales, esta relación puede ajustarse considerando las dimensiones del sensor y el tamaño de píxel.
+
+
+% Esta sección se descartaría, en su lugar hablar acerca de los modelos propuestos de Lanz dada su metodología - la utilizada para su modelo de estimación de distancias dadas las características de los objetos (Tamaño real - parámetros de la cámara)
+
+%\subsection{Estimación de Profundidad}
+%La estimación de profundidad monocular es una técnica de visión artificial que trata de reconstruir la representación de una escena en tres dimensiones partiendo de una única imagen en dos dimensiones. Este problema es por su naturaleza engañoso, ya que, para una misma proyección bidimensional, existen muchas configuraciones espacio temporales posibles. Más allá de esta ambigüedad subyacente, una serie de desarrollos teórico-experimentales han demostrado que es posible aprender a aproximarse a la verdad cuando se dispone de mucho contexto visual, modelos geométricos y técnicas de aprendizaje automático.\\
+% Desde el punto de vista geométrico, el modelo de cámara pinhole actúa como la base para interpretar la proyección de un punto 3D sobre un plano de imagen 2D, como se detalló previamente. En este modelo, la falta de información estéreo o de múltiples vistas implica que la escala absoluta de la escena no puede determinarse directamente, lo que introduce el concepto de ambigüedad de escala. 
+
+% \subsubsection{Ambigüedad de Escala}
+% Al utilizar una única imagen, no se dispone de información suficiente para determinar la escala absoluta de la escena, lo que introduce la conocida ambigüedad de escala. Esta limitación implica que los sistemas de visión monocular solo pueden recuperar relaciones de profundidad relativas, a menos que se incorporen señales adicionales, como la altura conocida de la cámara, pistas contextuales o supuestos geométricos sobre el entorno \cite{hartley2004multiple}. En un sistema de visión monocular, la proyección de una escena tridimensional (3D) sobre una imagen bidimensional (2D) a través de una cámara pinhole implica una pérdida inevitable de información métrica. Específicamente, la proyección preserva la dirección de los rayos que conectan la cámara con los puntos del entorno, pero no su distancia exacta desde el centro óptico [18]. Por tanto, múltiples configuraciones espaciales distintas pueden producir la misma imagen proyectada, siempre que mantengan proporciones relativas equivalentes entre los puntos proyectados.\\
+% Matemáticamente, si se tiene un punto 3D $\textbf{X}=(X,Y,Z,1)^T$ y su proyección en el plano de la imagen es $\textbf{x}=(x,y,1)^T$, se establece la relación proyectiva en (\ref{eq:projective_relation}).
+% \begin{equation}
+%    \textbf{x} \sim K[R|t]\textbf{X}
+%    \label{eq:projective_relation}
+% \end{equation}
+
+% donde $K$ representa la matriz de parámetros intrínsecos de la cámara (distancia focal, centro óptico, etc.), y $[R|t]$ codifica la rotación y traslación del sistema de referencia de la cámara. La notación $\sim$ denota igualdad hasta escala, lo cual implica que los puntos proyectados sólo están definidos hasta un factor escalar desconocido.\\
+% Dado que este sistema no incluye una referencia externa que permita fijar dicha escala, cualquier reconstrucción monocular de la escena resultará ambigua respecto al tamaño absoluto de los objetos o distancias reales. 
+
+% Aquí se hablaría de las redes neuronales recurrentes y las variantes GRU y LSTM utilizadas.
+
+\subsubsection{Modelo de Detección: YOLOv8}
+
+El modelo de detección utilizado en este proyecto es YOLOv8, una de las versiones más recientes de la familia \textit{You Only Look Once}, desarrollada por Ultralytics. Este enfoque pertenece a los detectores de una sola etapa, donde la predicción de cajas delimitadoras y categorías se realiza en un único proceso inferencial sobre la imagen completa, permitiendo lograr velocidades en tiempo real sin sacrificar precisión \cite{bochkovskiy2020yolov4}.
+
+A nivel conceptual, el detector toma una imagen de entrada 
+$I \in \mathbb{R}^{H \times W \times 3}$ 
+y produce un conjunto de predicciones 
+$\{\hat{\mathbf{b}}_i, \hat{c}_i, \hat{p}_i\}_{i=1}^N$, 
+donde $\hat{\mathbf{b}}_i = (\hat{x}_i,\hat{y}_i,\hat{w}_i,\hat{h}_i)$ corresponde a la caja delimitadora, $\hat{c}_i$ a la categoría predicha, y $\hat{p}_i$ a la probabilidad asociada.
+
+YOLOv8 conserva la estructura clásica de los detectores modernos: un \textit{backbone} para extraer características jerárquicas, un \textit{neck} para fusionar información multiescala mediante arquitecturas tipo FPN/PAN, y una \textit{cabeza} de predicción encargada de estimar cajas, clases y objetividad \cite{ultralytics2023yolov8}.
+
+Cada celda en los mapas de características predice un vector de salida del tipo:
+\begin{equation}
+    {p}_c = (o_c, \Delta x_c, \Delta y_c, \Delta w_c, \Delta h_c, {s}_c),
+\end{equation}
+
+donde $o_c$ es la probabilidad de presencia de objeto, 
+$(\Delta x_c, \Delta y_c, \Delta w_c, \Delta h_c)$ 
+son desplazamientos relativos para reconstruir la caja final, y 
+$\mathbf{s}_c$ contiene las puntuaciones de clase.
+
+La decodificación de una caja predicha se realiza mediante transformaciones paramétricas que ajustan los desplazamientos a la geometría del mapa de características:
+\[
+\hat{x}_c = \sigma(\Delta x_c) + c_x,\qquad
+\hat{y}_c = \sigma(\Delta y_c) + c_y,
+\]
+\[
+\hat{w}_c = e^{\Delta w_c} \cdot a_w,\qquad
+\hat{h}_c = e^{\Delta h_c} \cdot a_h,
+\]
+donde $(c_x,c_y)$ representa el centro de la celda y $(a_w,a_h)$ son factores de escala adaptados al enfoque \textit{anchor-free} adoptado por YOLOv8 \cite{ultralytics2023yolov8}.
+
+Tras la predicción, se aplica una etapa de post–procesado basada en \textit{Non-Maximum Suppression} (NMS) o \textit{Soft-NMS}, encargada de eliminar cajas redundantes y garantizar que el conjunto final de detecciones contenga instancias únicas y confiables.
+
+\subsection{Redes Neuronales Recurrentes}
+
+Las redes neuronales recurrentes (RNN) son una familia de arquitecturas diseñadas para procesar datos secuenciales —como series temporales, audio o texto— donde la información útil en un instante depende de eventos previos. A diferencia de las redes feed-forward, las RNN incorporan un \emph{estado oculto} que actúa como memoria a corto plazo y se actualiza paso a paso a medida que la secuencia es procesada. Esta propiedad las vuelve adecuadas para tareas donde la dinámica temporal o la dependencia contextual son fundamentales.

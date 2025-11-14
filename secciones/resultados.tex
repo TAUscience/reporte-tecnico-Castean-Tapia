@@ -1,0 +1,148 @@
+\section{Resultados}
+\label{cap-result}
+
+A continuación se presentan algunas gráficas y tablas sobre los resultados obtenidos.
+
+\subsection{Recolección de datos}
+
+\begin{figure}
+    \centering
+    % Subfigura lateral derecho
+    \begin{subfigure}{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/metodologia/tabla_alturas.png} \\
+        \caption{Tabla}
+        \label{subfig:table-data}
+    \end{subfigure}
+    \hfill
+    % Subfigura central
+    \begin{subfigure}{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/metodologia/histograma.png} \\
+        \caption{Histograma}
+        \label{subfig:histogram-heighs}
+    \end{subfigure}
+    \hfill
+    % Subfigura lateral izquierdo
+    \begin{subfigure}{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/metodologia/grafico_caja.png} \\
+        \caption{Gráfico de caja}
+        \label{subfig:box-heighs-persons}
+    \end{subfigure}
+    \caption{Alturas registradas de los voluntarios para la grabación de video, se presentan un histograma y un gráfico de caja para analizar las características de los datos}
+    \label{fig:datos_alturas}
+\end{figure}
+
+\subsection{Preprocesamiento de datos}
+\begin{figure}
+    \centering
+    % Subfigura lateral derecho
+    \begin{subfigure}{0.40\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/resultados/frames-ventanas.png} \\
+        \caption{Frames y ventanas}
+        \label{subfig:framevswindows}
+    \end{subfigure}
+    \hfill
+    % Subfigura central
+    \begin{subfigure}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/resultados/caja-ventanas.png} \\
+        \caption{Distribución de alturas}
+        \label{subfig:box-windows}
+    \end{subfigure}
+    \caption{Distribución de los frames y ventanas por altura}
+    \label{fig:result_preprocess}
+\end{figure}
+
+\begin{figure}
+    \centering
+    % Subfigura lateral derecho
+    \begin{subfigure}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/resultados/pastel_tvt.png} \\
+        \caption{Porcentajes por subgrupo}
+        \label{subfig:cake-tvt}
+    \end{subfigure}
+    \hfill
+    % Subfigura central
+    \begin{subfigure}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/resultados/distancias-por-grupo.png} \\
+        \caption{Distribución de distancias por subgrupo}
+        \label{subfig:distances-tvt}
+    \end{subfigure}
+    \caption{Distribución de los subgrupos de entrenamiento, prueba y validación}
+    \label{fig:result_distr_tvt}
+\end{figure}
+
+
+\subsection{Entrenamiento}
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{images/resultados/perdida_train.png}
+    \caption{Gráficas de pérdida durante el entrenamiento}
+    \label{fig:loss-train}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{images/resultados/results_graphics.png}
+    \caption{Gráficas de resultados obtenidos tras el entrenamiento}
+    \label{fig:results-rnn}
+\end{figure}
+
+\begin{table}[h!]
+    \centering
+    \caption{Métricas de evaluación del modelo en el conjunto de prueba}
+    \begin{tabular}{lcc}
+        \toprule
+        \textbf{Métrica} & \textbf{Valor} & \textbf{Unidad} \\
+        \midrule
+        MAE & $1.0001 \pm 1.1507$ & m \\
+        RMSE & $1.5245$ & m \\
+        R\textsuperscript{2} & $0.9454$ & --- \\
+        MAPE & $5.38\%$ & \% \\
+        Número de muestras & $5119$ & secuencias \\
+        \bottomrule
+    \end{tabular}
+    \label{tab:metricas_test}
+\end{table}
+
+\subsection{Modelo aplicado a un videos}
+\begin{figure}[H]
+    \centering
+    % Subfigura superior izquierda
+    \begin{subfigure}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/resultados/modelo_vid_1.png} \\
+        \label{subfig:vid-1}
+    \end{subfigure}
+    \hfill
+    % Subfigura superior derecha
+    \begin{subfigure}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/resultados/modelo_vid_2.png} \\
+        \label{subfig:vid-2}
+    \end{subfigure}
+
+    \vspace{0.5cm} % Espacio entre las filas de imágenes
+
+    % Subfigura inferior izquierda
+    \begin{subfigure}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/resultados/modelo_vid_3.png} \\
+        \label{subfig:vid-3}
+    \end{subfigure}
+    \hfill
+    % Subfigura inferior derecha
+    \begin{subfigure}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/resultados/modelo_vid_4.png} \\
+        \label{subfig:vid-4}
+    \end{subfigure}
+
+    \caption{Frames de resultado tras aplicar el modelo de red neuronal sobre videos}
+    \label{fig:result_videos}
+\end{figure}

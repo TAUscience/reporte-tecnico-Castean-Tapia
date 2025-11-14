@@ -94,6 +94,99 @@ donde $(c_x,c_y)$ representa el centro de la celda y $(a_w,a_h)$ son factores de
 
 Tras la predicción, se aplica una etapa de post–procesado basada en \textit{Non-Maximum Suppression} (NMS) o \textit{Soft-NMS}, encargada de eliminar cajas redundantes y garantizar que el conjunto final de detecciones contenga instancias únicas y confiables.
 
+\subsubsection{Modelo de seguimiento: DeepSORT}
+El modelo de seguimiento DeepSORT integra un modelo dinámico clásico con una métrica de asociación aprendida para mejorar la robustez frente a oclusiones y cambios de apariencia \cite{wojke2017simple}. DeepSORT opera sobre el conjunto de detecciones por cuadro provistas por el detector y resuelve, en línea, la correspondencia entre detecciones y trayectorias activas (tracks) mediante una combinación de información de movimiento y de apariencia.
+
+A nivel formal, cada track mantiene una estimación del estado dinámico del objeto modelado por un vector de estado
+\begin{equation}
+    \mathbf{x} = \begin{bmatrix} x & y & a & h & v_x & v_y & v_a & v_h \end{bmatrix}^\top,
+\end{equation}
+donde \(x,y\) son las coordenadas del centro de la caja, \(a\) la razón de aspecto (ancho/alto), \(h\) la altura de la caja, y \(v_x,v_y,v_a,v_h\) las correspondientes velocidades. El propósito de este espacio de estado es permitir una predicción cinemática simple (modelo de velocidad constante) y cuantificar la incertidumbre asociada a dicha predicción \cite{wojke2017simple}.
+
+La actualización del estado se realiza mediante un filtro de Kalman lineal discreto. Denotando por \(\mathbf{x}_{k|k-1}\) y \(P_{k|k-1}\) la predicción a priori del estado y su covarianza en el instante \(k\), y por \(\mathbf{z}_k\) la observación (medición) obtenida a partir de la detección, las ecuaciones básicas son:
+\begin{align}
+    \text{Predict:}\quad & \mathbf{x}_{k|k-1} = F \mathbf{x}_{k-1|k-1},\qquad 
+    P_{k|k-1} = F P_{k-1|k-1} F^\top + Q, \\
+    \text{Update:}\quad & K_k = P_{k|k-1} H^\top (H P_{k|k-1} H^\top + R)^{-1},\\
+    & \mathbf{x}_{k|k} = \mathbf{x}_{k|k-1} + K_k(\mathbf{z}_k - H\mathbf{x}_{k|k-1}),\\
+    & P_{k|k} = (I - K_k H) P_{k|k-1},
+\end{align}
+donde \(F\) es la matriz de transición de estado, \(H\) la matriz de observación, \(Q\) y \(R\) las covarianzas de proceso y de medición respectivamente, y \(K_k\) la ganancia de Kalman. Esta formulación permite predecir la posición y tamaño esperados de cada objeto y asignar una medida de confianza (covarianza) a la predicción \cite{kalman1960new}.
+
+Para realizar la asociación entre predicciones de tracks y detecciones observadas, DeepSORT construye una matriz de costos que combina dos componentes complementarios:
+
+\begin{enumerate}
+  \item \textbf{Componente de movimiento (Mahalanobis):} mide la discrepancia entre la detección \(\mathbf{d}_j\) y la predicción del filtro de Kalman para el track \(i\), teniendo en cuenta la incertidumbre del estado. Su forma es
+  \[
+    d_{\mathrm{M}}^2(i,j) = (\mathbf{d}_j - H\mathbf{x}_{i,k|k-1})^\top S_i^{-1}(\mathbf{d}_j - H\mathbf{x}_{i,k|k-1}),
+  \]
+  donde \(S_i = H P_{i,k|k-1} H^\top + R\) es la covarianza de la predicción proyectada al espacio de medición. En la práctica se aplica un \emph{gating} estadístico: asociaciones cuyo \(d_{\mathrm{M}}^2\) excede un umbral (por ejemplo, cuantiles de la distribución \(\chi^2\)) se consideran imposibles y se descartan antes de la asignación \cite{mahalanobis1936generalised}.
+  
+  \item \textbf{Componente de apariencia (similaridad):} para cada detección se extrae un \emph{embedding} visual \(f_j\in\mathbb{R}^D\) mediante una red CNN preentrenada para re-identificación (ReID). La similitud entre el embedding de la detección y el embedding representativo del track \(i\) se evalúa típicamente mediante la distancia coseno:
+  \[
+    d_{\cos}(i,j) = 1 - \frac{f_i^\top f_j}{\lVert f_i\rVert \lVert f_j \rVert}.
+  \]
+  DeepSORT mantiene un histórico corto de embeddings por track y usa la mínima o la media de distancias sobre ese banco para robustecer la comparación frente a variaciones de vista y oclusión .
+\end{enumerate}
+
+Estos dos términos se combinan en un costo total ponderado
+\begin{equation}
+    c(i,j) = \lambda \, d_{\mathrm{M}}^2(i,j) + (1-\lambda)\, d_{\cos}(i,j),
+\end{equation}
+con \(\lambda\in[0,1]\) controlando el balance entre la confianza en la predicción de movimiento y la evidencia visual de apariencia. La combinación lineal permite adaptar el comportamiento del tracker a distintos escenarios.
+
+Dada la matriz de costos \(C=[c(i,j)]\), la correspondencia entre \(M\) tracks y \(N\) detecciones se obtiene resolviendo un problema de asignación con costo mínimo. En la práctica DeepSORT emplea el algoritmo húngaro para obtener la asignación \(X=[x_{ij}]\) que minimiza \(\sum_{i,j} c(i,j) x_{ij}\) sujeto a restricciones de unicidad \cite{kuhn1955hungarian}. Para mejorar la robustez en presencia de tracks con distintas edades, DeepSORT aplica una \emph{matching cascade} que procesa primero tracks recientemente actualizados y deja para etapas posteriores los tracks más antiguos, reduciendo así los cambios de identidad (ID switches) en ventanas temporales con oclusiones parciales \cite{wojke2017simple}.
+
 \subsection{Redes Neuronales Recurrentes}
 
-Las redes neuronales recurrentes (RNN) son una familia de arquitecturas diseñadas para procesar datos secuenciales donde la información útil en un instante depende de eventos previos. A diferencia de las redes feed-forward, las RNN incorporan un \emph{estado oculto} que actúa como memoria a corto plazo y se actualiza paso a paso a medida que la secuencia es procesada. Esta propiedad las vuelve adecuadas para tareas donde la dinámica temporal o la dependencia contextual son fundamentales.
+Las redes neuronales recurrentes (RNN) pertenecen a una variante de arquitecturas diseñadas para procesar datos secuenciales donde la información útil en un instante depende de eventos previos. A diferencia de las redes feed-forward, las RNN incorporan un \emph{estado oculto} que actúa como memoria a corto plazo y se actualiza paso a paso a medida que la secuencia es procesada. Esta propiedad las vuelve adecuadas para tareas donde la dinámica temporal o la dependencia contextual son fundamentales.
+El modelo de RNN se puede describir mediante las ecuaciones siguientes:
+\begin{align}
+    h_t &= \phi\big(W_{xh} x_t + W_{hh} h_{t-1} + b_h\big), \label{eq:rnn_state}\\
+    y_t &= \psi\big(W_{hy} h_t + b_y\big), \label{eq:rnn_output}
+\end{align}
+donde \(x_t\in\mathbb{R}^{d_x}\) es la entrada, \(h_t\in\mathbb{R}^{d_h}\) el estado oculto, \(y_t\) la salida (si aplica), \(W_{xh}, W_{hh}, W_{hy}\) las matrices de pesos, \(b_h,b_y\) los sesgos, \(\phi\) una no linealidad (p.\,ej. \(\tanh\)) y \(\psi\) la función de salida (p.\,ej. softmax o identidad). La ecuación (\ref{eq:rnn_state}) explica cómo la red integra información nueva con su memoria previa.
+
+En cada instante temporal \(t\) la RNN combina la entrada actual \(x_t\) con su memoria previa \(h_{t-1}\) para producir un nuevo estado \(h_t\). El estado en \(h_t\) resume la información relevante vista hasta el tiempo \(t\). El reuso de los mismos parámetros a lo largo del tiempo (weight sharing) permite que la red generalice a secuencias de distinta longitud y aprenda patrones temporales sin aprender parámetros independientes por posición.
+
+Si definimos una pérdida por paso \( \ell(y_t, \hat{y}_t)\), la función de coste sobre una secuencia de longitud \(T\) es:
+\begin{equation}
+    \mathcal{L} = \sum_{t=1}^{T} \ell(y_t, \hat{y}_t).
+    \label{eq:seq_loss}
+\end{equation}
+El entrenamiento se realiza mediante \emph{Backpropagation Through Time} (BPTT), que aplica la regla de la cadena a la red desplegada en el tiempo, acumulando gradientes en cada paso temporal.
+
+Al calcular gradientes a través de muchas composiciones en el tiempo, las derivadas involucran productos iterados de jacobianos. Esto puede producir:
+\begin{itemize}
+    \item \textbf{Explosión del gradiente}: normas de gradiente que crecen exponencialmente, provocando inestabilidad en el entrenamiento.
+    \item \textbf{Desvanecimiento del gradiente}: normas que decrecen exponencialmente, imposibilitando el aprendizaje de dependencias a largo plazo.
+\end{itemize}
+Formalmente, la contribución del paso \(k\) al gradiente en el tiempo \(t\) contiene términos del tipo
+\[
+\prod_{i=k+1}^{t} \frac{\partial h_i}{\partial h_{i-1}} = \prod_{i=k+1}^{t} J_i,
+\]
+donde \(J_i\) es el jacobiano local \(\partial h_i/\partial h_{i-1}\). Si los autovalores de \(J_i\) son menores que 1 en módulo, el producto tiende a cero (desvanecimiento); si son mayores, tiende a infinito (explosión) \cite{pascanu2013difficulty}.
+Para aprender dependencias a largo plazo sin sufrir tanto el problema del gradiente, se introdujeron celdas con \emph{puertas}.
+
+\subsubsection{LSTM (Long Short-Term Memory)}
+Una celda LSTM incorpora una \emph{celda de memoria} \(c_t\) y tres puertas (forget, input, output) que controlan cuánto de la memoria previa se olvida, cuánto de la nueva entrada se almacena y qué parte de la memoria se expone como salida. Una formulación compacta es:
+\begin{align}
+    f_t &= \sigma(W_f x_t + U_f h_{t-1} + b_f) \\
+    i_t &= \sigma(W_i x_t + U_i h_{t-1} + b_i) \\
+    o_t &= \sigma(W_o x_t + U_o h_{t-1} + b_o) \\
+    \tilde{c}_t &= \tanh(W_c x_t + U_c h_{t-1} + b_c) \\
+    c_t &= f_t \odot c_{t-1} + i_t \odot \tilde{c}_t \\
+    h_t &= o_t \odot \tanh(c_t),
+\end{align}
+donde \(\sigma\) es la sigmoide y \(\odot\) el producto elemento a elemento. Estas compuertas permiten mantener información relevante en \(c_t\) durante muchos pasos, facilitando dependencias de largo alcance \cite{hochreiter1997long}.
+
+\subsubsection{GRU (Gated Recurrent Unit)}
+La GRU simplifica la LSTM combinando algunas puertas y estados en una estructura más compacta. Sus ecuaciones típicas son:
+\begin{align}
+    z_t &= \sigma(W_z x_t + U_z h_{t-1} + b_z) \\
+    r_t &= \sigma(W_r x_t + U_r h_{t-1} + b_r) \\
+    \tilde{h}_t &= \tanh(W_h x_t + U_h (r_t \odot h_{t-1}) + b_h) \\
+    h_t &= (1 - z_t)\odot h_{t-1} + z_t \odot \tilde{h}_t,
+\end{align}
+donde \(z_t\) es la \emph{update gate} y \(r_t\) la \emph{reset gate}. Las GRU a menudo logran desempeño comparable al de LSTM con menor número de parámetros \cite{cho2014learning}.
+

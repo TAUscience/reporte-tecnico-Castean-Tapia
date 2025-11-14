@@ -36,12 +36,12 @@
 \newpage
 
 \section*{Resumen}
-``En el presente proyecto se aborda el desarrollo de un sistema de estimación de distancias a transeúntes en entornos dinámicos mediante visión computacional monocular. A partir de imágenes capturadas desde la perspectiva de un peatón, se calcularon distancias reales aproximadas aplicando un modelo geométrico basado en las propiedades ópticas de la cámara y las dimensiones de los sujetos observados. Con estos datos se conformó un conjunto de entrenamiento que permitió ajustar una red neuronal recurrente (RNN) para la predicción de distancias en secuencias de video''. 
+``En el presente proyecto se aborda el desarrollo de un sistema de estimación de distancias a transeúntes en entornos dinámicos utilizando visión computacional monocular desde la perspectiva de un peatón. Para obtener referencias métricas confiables, se estimaron distancias reales aproximadas mediante un modelo geométrico que integra las propiedades intrínsecas de la cámara y las dimensiones físicas de los sujetos observados. Considerando la variabilidad natural en las estaturas de distintas personas, el sistema incorporó un dominio de alturas representativo con el fin de mejorar la robustez y la capacidad de generalización del modelo. Con estas mediciones se construyó un conjunto de entrenamiento que permitió ajustar una red neuronal recurrente (RNN) orientada a predecir distancias en secuencias de video, logrando un sistema capaz de adaptarse a escenarios dinámicos y a la diversidad de características de los peatones''. 
 
 \vspace{0.5cm}
 
 
-\textbf{Palabras clave:} Estimación de distancias, objetos dinámicos, visión computacional monocular, entornos urbanos. 
+\textbf{Palabras clave:} Estimación de distancias, entornos dinámicos, visión computacional monocular, transeúntes, modelo geométrico, RNN. 
 
 \newpage
 
@@ -65,11 +65,12 @@
 
 \newpage
 \section{Conclusiones}
-Durante esta etapa del proyecto se ha avanzado en la exploración de modelos auto-supervisados de estimación de profundidad monocular. Estos modelos han permitido comprender mejor el funcionamiento y limitaciones de este tipo de enfoques, especialmente en lo relativo a la ambigüedad de escala y su comportamiento en entornos no controlados. Si bien han mostrado resultados prometedores en contextos específicos, también han evidenciado que la precisión de las estimaciones puede degradarse significativamente ante cambios de iluminación, geometría compleja o variaciones en la dinámica de la escena.
+El proyecto cumplió con el objetivo principal de desarrollo y validación de un sistema de estimación de distancias basado en visión monocular desde la perspectiva de un peatón en movimiento. A diferencia de los trabajos previos centrados en escenarios vehículares, este estudio abordó un entorno peatonal real, construyendo un conjunto de datos propio con distancias medidas empíricamente y un análisis de características visuales relevantes, lo cual permitió entrenar un modelo adaptado al caso de uso.\\
 
-De este modo, se ha fortalecido la estructura metodológica del proyecto, incluyendo la planificación para la generación de un dataset propio y la evaluación inicial de modelos de última generación como DepthAnything, cuya arquitectura y rendimiento lo posicionan como un candidato prometedor para el caso de estudio. Este modelo ha sido probado de manera preliminar, lo que ha permitido obtener una visión más clara sobre su potencial y sobre los desafíos que aún deben resolverse.
+Los resultados demostraron que el sistema es capaz de estimar distancias de manera estable dentro del rango predominante del conjunto de datos, alcanzando un MAE aproximado de 1 m y un coeficiente de determinación $R^2$ cercano a 0.95 para los videos utilizados en el conjunto de prueba cuyos sujetos tenían una variabilidad de altura relativamente distinta entre sí. Por otro lado, las curvas de entrenamiento evidencian una convergencia consistente entre el error de entrenamiento y de validación, lo que indica que el modelo logró captar las relaciones geométricas esenciales entre la altura del sujeto en la imagen, la posición vertical del cuadro envolvente y la distancia real.\\
 
-Aunque los modelos analizados hasta ahora ofrecen una base interesante para abordar el problema, aún se requiere un trabajo más profundo tanto en la experimentación como en la integración de múltiples enfoques para abordar de forma más robusta las condiciones reales del entorno. Estos avances metodológicos y conceptuales constituyen una base sólida para continuar con las siguientes fases del proyecto.
+De manera general, el enfoque mostró una capacidad de generalización aceptable, donde las predicciones mantuvieron alta fidelidad respecto a las distancias medidas. Esto confirma que la combinación entre parámetros intrínsecos de cámara, variables geométricas, modelado recurrente constituye una estrategia efectiva para escenarios peatonales monoculares, aun sin recurrir a información de profundidad, sensores adicionales o reentrenamiento del detector.
+
 
 % Referencias
 \newpage

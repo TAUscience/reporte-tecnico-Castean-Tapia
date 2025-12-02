@@ -1,13 +1,42 @@
 \section{Introducción}
 \label{cap-intro}
 
-% Sección en edición, próximamente disponible
-
 La estimación de distancias es fundamental para el funcionamiento seguro y eficiente de sistemas móviles y autónomos, como vehículos autónomos, robots móviles y asistentes personales, y se realiza tradicionalmente mediante sistemas de imágenes estéreo, multicámara o mediciones LiDAR. Sin embargo, estos enfoques presentan limitaciones en términos de costo, casos de uso, sincronización, complejidad de equipamiento y consumo energético \cite{agand2024dmode}.  En contraste, la visión monocular, potenciada por avances en aprendizaje profundo, ha emergido como una alternativa viable y más accesible, permitiendo la estimación de profundidad a partir de una única imagen RGB . \cite{zhao2020monocular}.\\
 En la actualidad, los avances en visión computacional monocular han permitido desarrollar sistemas capaces de interpretar información visual de manera automatizada. Se han realizado estudios sobre la estimación de distancias entre vehículos \cite{zhe2020distance}, así como otros que amplían el análisis a múltiples objetos y entornos, aunque todavía se basan en perspectivas vehículares \cite{zhu2019objectdistance}. También existen enfoques basados en análisis geométrico que pueden escalarse a distintos objetos y escenarios \cite{shi2021geometry}. Sin embargo, a pesar de los avances y los buenos resultados obtenidos, los videos y conjuntos de datos utilizados siguen predominando en contextos de movimiento y captura vehicular, destacando el conjunto de datos de detección de objetos KITTI \cite{geiger2013kitti}, que fue recopilado desde una camioneta.\\
 En este contexto, el proyecto desarrolla y valida un sistema de estimación de distancias a partir de video monocular filmado desde la perspectiva de un peatón, integrando un enfoque geométrico que aprovecha la altura real de los sujetos y los parámetros intrínsecos de la cámara, a partir de los cuales se construyó un conjunto de datos propio; el análisis estadístico de esas mediciones mostró que características visuales como la altura en píxeles y la coordenada vertical del centro del cuadro envolvente de cada persona correlacionan de manera consistente con la distancia real, lo cual orientó la selección de entradas del modelo. Sobre esa base se diseñó y entrenó una arquitectura recurrente para realizar regresión de distancia en secuencias temporales, y se integró un detector YOLOv8 —sin reentrenamiento— para localizar peatones en cada cuadro y alimentar el sistema. Los resultados experimentales, muestran la capacidad del enfoque para generalizar a personas de alturas variables en escenarios dinámicos y establecen las métricas de error y limitaciones que guían futuras mejoras.   
 
 \subsection{Antecedentes}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}c p{6cm} c@{}}
+\toprule
+\textbf{Referencia} & \textbf{Contribuciones} & \textbf{Limitaciones} \\
+\midrule
+
+\cite{} & From sensor networks without cameras to smart cameras in 3D environments & Review \\
+
+[23] & Introduce an approach to classifying methods and using video as a localization sensor in multi-sensor systems. & Review \\
+
+[18] & To provide a complete set of classifications for image-based camera localization. & Review \\
+
+[21] & Incorporating contemporary techniques into an identified visual capture environment. & Survey \\
+
+[24] & Explain the idea, the evolution of the approaches, and the benefits and drawbacks & Review \\
+
+[17] & A complete investigation of visual-LiDAR SLAM & Review \\
+
+[25] & Describe the assessment criteria for camera localization, as well as specific applications. & Critical Analysis \\
+
+[26] & Define the SLAM characteristics based on visual odometry and perceptual methods. & Review \\
+
+[27] & Solutions for indoor positioning are proposed based on novel classifications, sensor data, kinds of detected items, and localization technique. & Survey \\
+
+[28] & Various indoor and outdoor positioning techniques and methods, with a focus on indoor techniques and ideas & Survey \\
+
+\bottomrule
+\end{tabular}
+\end{table}
 
 \begin{table}[H]
 \centering
@@ -81,14 +110,17 @@ Evaluar la eficacia de un sistema de estimación de distancias en entornos diná
 
 La detección y estimación de distancias de objetos en entornos dinámicos es fundamental para mejorar la seguridad y la eficiencia de sistemas móviles. Aunque existen soluciones basadas en sensores especializados como LiDAR o sistemas estéreo, estos suelen implicar un costo elevado, mayor consumo energético y limitaciones de integración en dispositivos ligeros. Por otro lado, las metodologías puramente monoculares ofrecen una alternativa más accesible, aunque presentan dificultades para obtener estimaciones métricas precisas, especialmente cuando la cámara se encuentra en movimiento y las condiciones de captura difieren de las utilizadas durante el entrenamiento de los modelos.\\
 En este sentido, en el trabajo presente se propone abordar dicha brecha mediante \begin{enumerate}
-    \item la captura y anotación de un dataset propio, recolectado con la cámara y resolución reales del sistema objetivo
-    \item el entrenamiento supervisado de una arquitectura recurrente híbrida diseñada para explotar dependencias temporales y aprender una transformación hacia una escala métrica ajustada a nuestras condiciones de captura.
+    \item Captura y anotación de un conjunto de datos propio, recolectado con la cámara y resolución reales del sistema objetivo
+    \item Entrenamiento supervisado de una arquitectura recurrente híbrida diseñada para explotar dependencias temporales y aprender una transformación hacia una escala métrica ajustada a nuestras condiciones de captura.
 \end{enumerate}
 Con ello se busca analizar hasta qué punto un enfoque supervisado y adaptado al dominio específico de la cámara puede mejorar la coherencia métrica frente a modelos genéricos entrenados en otros dominios o a aproximaciones auto-supervisadas no ajustadas.
 
 \subsection{Hipótesis}
 
-La estimación inicial de distancias, obtenida a partir de los parámetros intrínsecos de la cámara y de características observables de los sujetos en el entorno, permite establecer una aproximación métrica que sirve como base para el entrenamiento supervisado de una arquitectura recurrente híbrida. Se plantea que, al incorporar dependencias temporales presentes en las secuencias de video y aprovechar la variabilidad de altura entre los distintos sujetos, el modelo puede aprender una representación más generalizable y coherente de la escala métrica, mejorando la precisión de las estimaciones de distancia en escenas dinámicas capturadas con cámara monocular.
+La estimación inicial de distancias, obtenida a partir de los parámetros intrínsecos de la cámara y de características observables de los sujetos en el entorno, permite establecer una aproximación métrica que sirve como base para el entrenamiento supervisado de una arquitectura recurrente híbrida. 
+
+% Quitar la segunda parte del párrafo de la hipótesis ya que no es parte de la misma : JESÚS GARCÍA RAMIREZ
+% Se plantea que, al incorporar dependencias temporales presentes en las secuencias de video y aprovechar la variabilidad de altura entre los distintos sujetos, el modelo puede aprender una representación más generalizable y coherente de la escala métrica, mejorando la precisión de las estimaciones de distancia en escenas dinámicas capturadas con cámara monocular.
 
 \subsection{Aportación científica y/o tecnológica}
 

@@ -1,116 +1,98 @@
 \section{Resultados}
 \label{cap-result}
 
-A continuación se presentan algunas gráficas y tablas sobre los resultados obtenidos.
-
-\subsection{Recolección de datos}
-
+En esta sección se presentan los resultados obtenidos al evaluar las dos variantes de la red recurrente (GRU y LSTM) entrenadas bajo la configuración descrita previamente. Primero se muestran las curvas de entrenamiento para comprobar la convergencia (ver Fig \ref{fig:training_curves}); a continuación, se reportan las métricas agregadas en \emph{test} y se realiza un análisis de error detallado: distribución global (ver Tabla \ref{tab:metrics_comparison}) y por rangos de distancia (ver Fig \ref{fig:results_gru_lstm}). Finalmente se muestran ejemplos cualitativos y una discusión sobre el comportamiento observado.
+\subsection{Dinámica de entrenamiento}
+La figura \ref{fig:training_curves} muestra la evolución de la pérdida (MSE) durante el entrenamiento de ambas variantes (GRU a la izquierda y LSTM a la derecha). Se observa una caída pronunciada de la pérdida en las primeras épocas seguida de una meseta intermedia y una nueva reducción posterior. 
 \begin{figure}[H]
-    \centering
-    % Subfigura lateral derecho
-    \begin{subfigure}{0.32\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{images/metodologia/tabla_alturas.png} \\
-        \caption{Tabla}
-        \label{subfig:table-data}
-    \end{subfigure}
-    \hfill
-    % Subfigura central
-    \begin{subfigure}{0.32\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{images/metodologia/histograma.png} \\
-        \caption{Histograma}
-        \label{subfig:histogram-heighs}
-    \end{subfigure}
-    \hfill
-    % Subfigura lateral izquierdo
-    \begin{subfigure}{0.32\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{images/metodologia/grafico_caja.png} \\
-        \caption{Gráfico de caja}
-        \label{subfig:box-heighs-persons}
-    \end{subfigure}
-    \caption{Alturas registradas de los voluntarios para la grabación de video, se presentan un histograma y un gráfico de caja para analizar las características de los datos}
-    \label{fig:datos_alturas}
+  \centering
+  \includegraphics[width=0.48\linewidth]{images/resultados/GRULoss.png}
+  \includegraphics[width=0.48\linewidth]{images/resultados/LSTMLoss.png}
+  \caption{Evolución de la pérdida (MSE) durante el entrenamiento para GRU (izquierda) y LSTM (derecha).}
+  \label{fig:training_curves}
 \end{figure}
 
-\subsection{Preprocesamiento de datos}
-\begin{figure}[H]
-    \centering
-    % Subfigura lateral derecho
-    \begin{subfigure}{0.40\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{images/resultados/frames-ventanas.png} \\
-        \caption{Frames y ventanas}
-        \label{subfig:framevswindows}
-    \end{subfigure}
-    \hfill
-    % Subfigura central
-    \begin{subfigure}{0.45\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{images/resultados/caja-ventanas.png} \\
-        \caption{Distribución de alturas}
-        \label{subfig:box-windows}
-    \end{subfigure}
-    \caption{Distribución de los frames y ventanas por altura}
-    \label{fig:result_preprocess}
-\end{figure}
+Proponemos como hipótesis que este comportamiento en dos fases está relacionado con la naturaleza estocástica del entrenamiento y con la forma en que se construyen los mini-batches. En una primera etapa, el modelo aprende patrones generales y la pérdida desciende rápidamente; después aparece una meseta cuando las actualizaciones dejan de producir mejoras claras. Con el paso de las épocas, la variación entre batches —así como la posible agrupación de ejemplos por \emph{target\_id}— introduce suficiente diversidad como para que el optimizador salga de ese estancamiento y logre una segunda etapa de refinamiento. \\
+Otro aspecto relevante observado durante el entrenamiento fue la diferencia en convergencia y tiempo entre las dos variantes. El modelo GRU alcanzó su mejor validación mucho antes (época 51) que la LSTM (época 115), lo que indica una convergencia más rápida en las condiciones experimentales usadas. Por otra parte, la LSTM alcanzó un mejor `val\_mae` final (0.5016 m frente a 0.5288 m para la GRU), a costa de más épocas y mayor tiempo por época. Estas diferencias pueden presentarse debido a las características internas de cada bloque recurrente (capacidad de modelado y coste computacional) como a la configuración experimental (número de unidades por bloque, batching por \emph{target\_id}, etc.).
 
-\begin{figure}[H]
-    \centering
-    % Subfigura lateral derecho
-    \begin{subfigure}{0.45\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{images/resultados/pastel_tvt.png} \\
-        \caption{Porcentajes por subgrupo}
-        \label{subfig:cake-tvt}
-    \end{subfigure}
-    \hfill
-    % Subfigura central
-    \begin{subfigure}{0.45\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{images/resultados/distancias-por-grupo.png} \\
-        \caption{Distribución de distancias por subgrupo}
-        \label{subfig:distances-tvt}
-    \end{subfigure}
-    \caption{Distribución de los subgrupos de entrenamiento, prueba y validación}
-    \label{fig:result_distr_tvt}
-\end{figure}
-
-
-\subsection{Entrenamiento}
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1\linewidth]{images/resultados/perdida_train.png}
-    \caption{Gráficas de pérdida durante el entrenamiento}
-    \label{fig:loss-train}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1\linewidth]{images/resultados/results_graphics.png}
-    \caption{Gráficas de resultados obtenidos tras el entrenamiento}
-    \label{fig:results-rnn}
-\end{figure}
-
+\subsection{Evaluación en conjunto de prueba}
+\subsubsection{Métricas globales}
+Las métricas globales se calcularon sobre el conjunto de prueba para comparar de forma directa el desempeño de las dos variantes entrenadas (LSTM y GRU). Se reportan MAE (con su desviación estándar del error absoluto), RMSE, R$^2$, MAPE y el número de secuencias evaluadas. La tabla \ref{tab:metrics_comparison} resume los resultados obtenidos por ambos modelos.
 \begin{table}[H]
-    \centering
-    \caption{Métricas de evaluación del modelo en el conjunto de prueba}
-    \begin{tabular}{lcc}
-        \toprule
-        \textbf{Métrica} & \textbf{Valor} & \textbf{Unidad} \\
-        \midrule
-        MAE & $1.0001 \pm 1.1507$ & m \\
-        RMSE & $1.5245$ & m \\
-        R\textsuperscript{2} & $0.9454$ & --- \\
-        MAPE & $5.38\%$ & \% \\
-        Número de muestras & $5119$ & secuencias \\
-        \bottomrule
-    \end{tabular}
-    \label{tab:metricas_test}
+\centering
+\begin{tabular}{l cc}
+\hline
+\textbf{Métrica} & \textbf{LSTM} & \textbf{GRU} \\
+\hline
+MAE (m) & $0.7106 \pm 0.6116$ & $0.7358 \pm 0.5726$ \\
+RMSE (m) & $0.9376$ & $0.9324$ \\
+R$^2$ & $0.9792$ & $0.9794$ \\
+MAPE (\%) & $4.11$ & $4.30$ \\
+\hline
+\end{tabular}
+\caption{Comparativa de métricas globales en el conjunto de prueba para las variantes LSTM y GRU.}
+\label{tab:metrics_comparison}
 \end{table}
 
-\subsection{Modelo aplicado a videos}
+La LSTM muestra un MAE y un MAPE ligeramente mejores que la GRU, mientras que la GRU presenta un RMSE marginalmente menor y un R$^2$ prácticamente idéntico. Las diferencias son pequeñas en magnitud.
+
+\subsubsection{Visualización de resultados}
+A continuación, en la Figura~\ref{fig:results_gru_lstm} se presentan las visualizaciones principales que permiten analizar el comportamiento de ambas variantes en el conjunto de prueba. Estas figuras complementan las métricas numéricas previamente reportadas y ofrecen una vista directa sobre la relación entre las predicciones y los valores reales, así como sobre la distribución y magnitud de los errores obtenidos para cada arquitectura.
+\begin{figure}[H]
+  \centering
+
+  % --- Fila 1: GRU ---
+  \begin{subfigure}{0.32\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{images/resultados/aGRU.png}
+    \caption{}
+    \label{subfig:gru_pred_vs_real}
+  \end{subfigure}\hfill
+  \begin{subfigure}{0.32\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{images/resultados/bGRU.png}
+    \caption{}
+    \label{subfig:gru_err_hist}
+  \end{subfigure}\hfill
+  \begin{subfigure}{0.32\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{images/resultados/cGRU.png}
+    \caption{}
+    \label{subfig:gru_abs_err_hist}
+  \end{subfigure}
+
+  \vspace{6pt} % espacio entre filas
+
+  % --- Fila 2: LSTM ---
+  \begin{subfigure}{0.32\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{images/resultados/dLSTM.png}
+    \caption{}
+    \label{subfig:lstm_pred_vs_real}
+  \end{subfigure}\hfill
+  \begin{subfigure}{0.32\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{images/resultados/eLSTM.png}
+    \caption{}
+    \label{subfig:lstm_err_hist}
+  \end{subfigure}\hfill
+  \begin{subfigure}{0.32\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{images/resultados/fLSTM.png}
+    \caption{}
+    \label{subfig:lstm_abs_err_hist}
+  \end{subfigure}
+
+  \caption{Comparativa visual del desempeño en test: fila superior = GRU; fila inferior = LSTM. (a)/(d) Predicción vs.\ Real con línea identidad; (b)/(e) histograma de errores (\( \text{Pred} - \text{Real} \)); (c)/(f) histograma de errores absolutos.}
+  \label{fig:results_gru_lstm}
+\end{figure}
+
+A partir de estas representaciones se puede contrastar directamente el comportamiento de ambas arquitecturas. \\
+En términos del análisis de la alineación entre las predicciones y los valores reales, las subfiguras~\ref{subfig:gru_pred_vs_real} y~\ref{subfig:lstm_pred_vs_real} permiten observar que tanto el modelo GRU como el de LSTM siguen una tendencia cercana a la línea identidad, lo que indica que, en general, el modelo logra replicar adecuadamente la progresión de distancias del conjunto de prueba. La GRU muestra una dispersión un poco mayor, especialmente en distancias altas, mientras que la LSTM mantiene un agrupamiento ligeramente más consistente alrededor de la referencia. En esta última también se aprecia una leve subestimación en el intervalo aproximado de 2–3 m, aunque se trata de un efecto reducido.\\
+Las distribuciones de error presentadas en las subfiguras correspondientes (ver Fig.~\ref{subfig:gru_err_hist}, \ref{subfig:lstm_err_hist}) muestran una forma aproximadamente gaussiana centrada en valores cercanos a cero, lo que sugiere ausencia de sesgos marcados y estabilidad general en las predicciones. En la variante GRU, la media del error es \(\mu = -0.348\,\text{m}\) y su dispersión alcanza \(\sigma = 0.865\,\text{m}\), reflejando una leve subestimación acompañada de una variabilidad moderada. Por otra parte, la LSTM presenta una media aún más próxima a cero, \(\mu = -0.218\,\text{m}\), junto con una desviación estándar ligeramente mayor, \(\sigma = 0.912\,\text{m}\).\\
+En las distribuciones de errores absolutos mostradas en las subfiguras \ref{subfig:gru_abs_err_hist} y \ref{subfig:lstm_abs_err_hist} permiten evaluar la magnitud típica de las desviaciones en las predicciones. En ambos modelos se observa una concentración alta de valores por debajo de 1\,m, lo que indica que la mayoría de las estimaciones se mantienen dentro de un rango de error reducido. En la GRU, la mayor concentración de valores se agrupa ligeramente más cerca del origen, reflejando su MAE de menor magnitud. En la LSTM, aunque también predomina la zona de errores pequeños, la cola de la distribución se extiende un poco más, consistente con la presencia ocasional de errores absolutos mayores.
+
+\subsection{Inferencia del modelo sobre videos}
 \begin{figure}[H]
     \centering
     % Subfigura superior izquierda

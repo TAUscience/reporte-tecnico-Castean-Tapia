@@ -78,7 +78,6 @@ Los parámetros intrínsecos de la cámara (distancia focal y dimensiones del se
 
 \begin{table}[H]
 \centering
-\label{tab:intrinsec}
 \begin{tabular}{lcc}
 \hline
 \textbf{Parámetro} & \textbf{Valor} & \textbf{Unidad} \\
@@ -89,13 +88,13 @@ Distancia focal & 15 & mm \\
 \hline
 \end{tabular}
 \caption{Parámetros intrínsecos utilizados para la estimación de distancia.}
+\label{tab:intrinsec}
 \end{table}
 
  El desempeño de la relación geométrica se describe en la Tabla \ref{tab:err} y en la Figura \ref{fig:abserr}, donde se muestra la distribución del error absoluto frente a la distancia de referencia.
  
 \begin{table}[H]
 \centering
-\label{tab:err}
 \begin{tabular}{r r r r r}
 \toprule
 GT (m) & N muestras & Pred. mediana (m) & Error abs. (m) & Error \% \\
@@ -104,7 +103,7 @@ GT (m) & N muestras & Pred. mediana (m) & Error abs. (m) & Error \% \\
 5.0  & 4 & 5.0020  & 0.0020 & 0.04\% \\
 7.5  & 3 & 7.4320  & 0.0680 & 0.91\% \\
 10.0 & 3 & 9.9610  & 0.0390 & 0.39\% \\
-12.5 & 3 & 12.2600 & 0.2400 & 1.92\% \\
+12.5 & 3 & 12.2600 & 0.2400 & 1.92\% \\this file is not necessary
 15.0 & 3 & 15.2590 & 0.2590 & 1.73\% \\
 17.5 & 2 & 17.4390 & 0.0610 & 0.35\% \\
 20.0 & 2 & 19.7880 & 0.2120 & 1.06\% \\
@@ -113,6 +112,7 @@ GT (m) & N muestras & Pred. mediana (m) & Error abs. (m) & Error \% \\
 \bottomrule
 \end{tabular}
 \caption{Resumen de la precisión por punto de referencia (mediana de las predicciones por punto).}
+\label{tab:err}
 \end{table}
 
 \begin{figure}[H]
@@ -136,24 +136,9 @@ Finalmente, una vez validados los parámetros intrínsecos y obtenidas las medic
     \label{fig:dataDist}
 \end{figure}
 
-
-\subsection{Análisis de datos}
-A partir del archivo con las anotaciones consolidadas se realizó un análisis exploratorio para justificar la selección de variables a emplear en el entrenamiento del modelo. La selección se apoyó en una matriz de correlación entre las variables anotadas y la distancia. La matriz de correlación (Figura~\ref{fig:dataCorr}) se calculó utilizando la correlación de Pearson sobre las columnas numéricas relevantes y se visualizó mediante un \emph{heatmap}.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\linewidth]{images/metodologia/corr.png}
-    \caption{Matriz de correlación entre características geométricas y distancia}
-    \label{fig:dataCorr}
-\end{figure}
-
-A partir de esta matriz se identificaron dos características con mayor correlación negativa respecto a la distancia: la altura del cuadro envolvente (bbox height, \textminus 0.84) y la coordenada vertical de su centro (y\_center, \textminus 0.30). Ambas variables se relacionan de manera inversa con la distancia real, ya que, conforme una persona se aleja de la cámara, su tamaño proyectado en la imagen disminuye y, en consecuencia, la altura del \emph{bbox} se reduce. De forma complementaria, la perspectiva de la cámara provoca que el centro del objeto se desplace gradualmente hacia la parte superior del fotograma; es decir, valores menores de y\_center suelen asociarse con objetos más lejanos.
-
-
-
 \subsection{Análisis y Preprocesamiento de datos}
 
-A partir del archivo con las anotaciones consolidadas se llevó a cabo un estudio detallado del conjunto de datos, orientado primero a comprender el comportamiento de las variables disponibles y posteriormente a adecuarlas para su uso en el modelo. Este proceso involucró analizar la relación entre las características geométricas y la distancia real para identificar aquellas con mayor capacidad predictiva, y, con base en ello, aplicar una serie de transformaciones destinadas a garantizar la coherencia y calidad temporal de las secuencias, homogenizar la escala de las variables y organizar la información en segmentos adecuados para su procesamiento por redes recurrentes. El flujo completo de esta etapa se resume en la Figura~\ref{fig:diag_preprocess}. Dicho esquema ilustra las ocho etapas que conforman el procedimiento, desde la depuración inicial de las anotaciones hasta la organización final de las ventanas temporales utilizadas durante el entrenamiento.
+A partir del archivo con las anotaciones consolidadas se llevó a cabo un estudio detallado del conjunto de datos, orientado primero a comprender el comportamiento de las variables disponibles y posteriormente a adecuarlas para su uso en el modelo. Este proceso involucró analizar la relación entre las características geométricas y la distancia real para identificar aquellas con mayor capacidad predictiva, y, con base en ello, aplicar una serie de transformaciones destinadas a garantizar la coherencia y calidad temporal de las secuencias, homogenizar la escala de las variables y organizar la información en segmentos adecuados para su procesamiento por redes recurrentes. El flujo completo de esta etapa se resume en la Figura~\ref{fig:diag_preprocess}. Dicho esquema ilustra las etapas que conforman el procedimiento, desde la depuración inicial de las anotaciones hasta la organización final de las ventanas temporales utilizadas durante el entrenamiento.
 
 \begin{figure}[H]
     \centering
@@ -166,34 +151,145 @@ A partir del archivo con las anotaciones consolidadas se llevó a cabo un estudi
 
 Durante la inspección de calidad de las anotaciones se observó que existieron errores de identificación y seguimiento provistos por el algoritmo DeepSORT (ver Fig.\ref{fig:diag_etiquetado}). Esto debido a que, ante oclusiones o cambios bruscos en la apariencia o posición, el algoritmo prioriza la asociación que minimiza su costo interno (apariencia + predicción del filtro Kalman), lo que puede conducir a confundir detecciones cercanas. Estas reasignaciones dieron lugar a distancias anotadas que no correspondían al sujeto objetivo.\\
 Para detectar estos fallos se generaron versiones del video con las anotaciones (bbox, identificador de track y distancia anotada) superpuestas por cada target; esta revisión visual inicial permitió localizar y contextualizar los instantes en que las anotaciones resultaban incongruentes con la distancia conocida del sujeto.\\ 
-A partir de esta referencia visual, la depuración consistió en verificar, 
+A partir de esta referencia visual, la depuración consistió en verificar, la correspondencia entre la bbox y el sujeto de interés, revisando el historial temporal del track para detectar cambios de identidad y se contrastaron los valores de distancia anotada con la observación directa en el vídeo. Cuando la evidencia mostraba que la detección correspondía a otra persona u objeto la anotación se consideró errónea y se eliminó del conjunto de trabajo
 
 \subsubsection{Análisis de datos}
 
-A continuación, debido a la naturaleza secuencial de las redes recurrentes, se realizó la agrupación de los datos por medio del identificador de la persona y del video, esto con el fin de evitar que el modelo fuera entrenado con una secuencia que saltara de una persona a otra. 
+A partir del archivo con las anotaciones ya depuradas se realizó un análisis exploratorio para justificar la selección de variables a emplear en el entrenamiento del modelo. La selección se apoyó en una matriz de correlación entre las variables anotadas y la distancia. La matriz de correlación (Figura~\ref{fig:dataCorr}) se calculó utilizando la correlación de Pearson sobre las columnas numéricas relevantes y se visualizó mediante un \emph{heatmap}.
 
-El paso siguiente fue la selección de las características, con base en los datos proporcionados, las características relevantes tomadas fueron: la coordenada vertical del punto central del cuadro envolvente y la altura de éste recuadro. La normalización consistió en dividir dichos valores entre 1080 (altura en pixeles del frame); de tal forma que se pasa de tener las características en pixeles a tenerlas en valores de 0 a 1. 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{images/metodologia/corr.png}
+    \caption{Matriz de correlación entre características geométricas y distancia}
+    \label{fig:dataCorr}
+\end{figure}
 
-Debido a la previa eliminación de frames con datos erróneos, la secuencia de imágenes pudo haber perdido su consistencia temporal, para corregir esto se realizaron segmentaciones; lo anterior consiste en verificar si la secuencia perdió más de 3 frames durante la limpieza de datos, y de ser así se divide la secuencia en dos diferentes, con el punto de corte justo en la posición de la pérdida de frames. Al finalizar este proceso se obtienen múltiples cadenas de frames con una correcta consistencia temporal.
+A partir de esta matriz se identificaron dos características con mayor correlación negativa respecto a la distancia: la altura del cuadro envolvente (bbox height, \textminus 0.84) y la coordenada vertical de su centro (y\_center, \textminus 0.30). Ambas variables se relacionan de manera inversa con la distancia real, ya que, conforme una persona se aleja de la cámara, su tamaño proyectado en la imagen disminuye y, en consecuencia, la altura del \emph{bbox} se reduce.\\
+De forma complementaria, la perspectiva de la cámara provoca que el centro del objeto se desplace gradualmente hacia la parte superior del fotograma; es decir, valores menores de y\_center suelen asociarse con objetos más lejanos.\\
+Para reducir multicolinealidad y favorecer que el modelo aprenda características claramente informativas, se optó por seleccionar una sola variable del grupo redundante (en este caso la altura) dado que presentó la correlación más alta con la distancia. La coordenada vertical del centro (y\_center) se conservó porque no evidenció redundancia con la altura y aporta información geométrica complementaria ligada a la perspectiva de la cámara. En consecuencia, las variables utilizadas como entradas principales del modelo fueron la altura del \emph{bbox} y la coordenada vertical del centro, decisión que además simplifica la interpretación del modelo y reduce la dimensionalidad del espacio de entrada.
 
-Las redes neuronales recurrentes reciben secuencias de información para predecir el valor final; por lo tanto, se utiliza un tamaño de ventana que define cuántos valores va a recibir la red por cada muestra. El tamaño de ventana propuesto es de cinco valores, de cada secuencia original se tomarán esos cinco valores y se seleccionarán con un desplazamiento de dos frames hacia adelante. Además, lo anterior permite aumentar el numero de muestras, de acuerdo a la Eq.\ref{eq:n_ventanas} y mantener la dinámica temporal de la secuencia.
+\subsubsection{Segmentación temporal}
+Una vez definido el conjunto depurado de anotaciones, las muestras se organizaron siguiendo una estructura jerárquica basada en el individuo registrado (\textit{target\_id}), el video correspondiente (\textit{video\_id}) y el índice temporal de cada imagen (\textit{frame\_id}). Esta organización permitió reconstruir las secuencias originales de cada persona y preservar la relación temporal entre los cuadros capturados, condición necesaria para la posterior creación de ventanas temporales. \\
+Posteriormente, se verificó la continuidad temporal de cada secuencia. La depuración previa de cuadros con anotaciones inválidas podía introducir saltos abruptos en el índice de fotogramas, comprometiendo la coherencia temporal necesaria para el aprendizaje secuencial. Para corregirlo, se realizaron segmentaciones; cada video se recorrió en busca de pérdidas superiores a tres \textit{frames} consecutivos, de manera que si esto ocurre se divide la secuencia en dos diferentes, con el punto de corte justo en la posición de la pérdida de frames. Al finalizar este proceso se obtienen múltiples cadenas de frames con una correcta consistencia temporal.
+
+
+A partir de las subsecuencias temporalmente consistentes obtenidas tras la segmentación, se procede a la construcción de ventanas deslizantes que constituyen las muestras de entrada para el modelo.
+Cada ventana está definida por una longitud fija (\textit{seq\_len}) y un desplazamiento entre ventanas consecutivas (\textit{stride}).\\
+La longitud de ventana propuesto es de diez valores, de cada secuencia original se tomarán estos cinco valores y se seleccionarán con un desplazamiento de dos frames hacia adelante. Lo anterior permite aumentar el número de muestras y mantiene la dinámica temporal de la secuencia.\\
+Formalmente, para una segmento de longitud \(L\), el número de ventanas generadas se calcula como:
 
 \begin{equation}
     N_{\text{ventanas}} = \left\lfloor \frac{L - \text{longitud\_ventana}}{\text{desplazamiento}} \right\rfloor + 1
     \label{eq:n_ventanas}
 \end{equation}
 
-Finalmente se realizó la división del conjunto de entrenamiento en un 70 porciento y 15 porciento tanto para validación como para prueba. Dentro del conjunto de entrenamiento se forzó a que los datos del individuo con la menor altura (1.51) estuvieran presentes. Con los datos de entrenamiento se ajustó la estandarización de características y se aplicaron a los demás subconjuntos.
-Cada muestra tiene una dimensión de (5,2), correspondiente a 5 frames y dos características cada uno, por otro lado, el objetivo (\textit{target}) es la distancia correspondiente al último \textit{frame} en milímetros.
+En la figura \ref{fig:windowsGen} se ilustra la cantidad de ventanas generadas por target dada la ecuación \ref{eq:n_ventanas}.
 
-\subsection{Modelo de red neuronal recurrente híbrida}
-\begin{figure}
+\begin{figure}[H]
     \centering
-    \includegraphics[width=\linewidth]{images/metodologia/nn_diagram.pdf}
-    \caption{Arquitectura de la RNN híbrida}
-    \label{fig:diag_nn}
+    \includegraphics[width=\linewidth]{images/metodologia/frames-ventanas.png}
+    \caption{Número de ventanas generadas por individuo-video}
+    \label{fig:windowsGen}
 \end{figure}
 
-Debido a la naturaleza secuencial de los datos, se propone una arquitectura de red con capas de LSTM y GRU (ver Fig.\ref{fig:diag_nn}). Se tiene una entrada temporal de dos variables seguida de dos capas recurrentes y dos densas con una salida de una sola unidad. Las capas recurrentes utilizan la función de activación \texttt{tanh} para las activaciones principales y \texttt{sigmoid} para las demás, mientras que en las capas intermedias densas se utiliza \texttt{ReLU} y en la capa de salida la función \texttt{lineal}.
+\subsubsection{Partición del conjunto de datos}
+Con las ventanas generadas por individuo, se procede a la partición del conjunto de datos en subconjuntos de entrenamiento (\emph{train}), validación (\emph{val}) y prueba (\emph{test}).\\
+Antes de aplicar la partición, se definió manual y deliberadamente qué \emph{targets} pertenecerían a cada subconjunto; esta asignación buscó favorecer la capacidad de generalización del modelo, procurando que \emph{train}, \emph{val} y \emph{test} incluyeran individuos con distinta variabilidad (por ejemplo, rangos de estatura y condiciones de captura diversas), siempre garantizando que ningún \emph{target} se repita entre subconjuntos.\\
+A partir de las listas manuales, la separación efectiva se llevó a cabo mediante máscaras booleanas: para cada ventana se comprueba si su \emph{target\_id} aparece en la lista correspondiente, generando filtros que seleccionan todas las ventanas asociadas a los individuos asignados. Este mecanismo asegura que cada persona quede íntegramente contenida en un único subconjunto, evita fugas de información entre entrenamiento y evaluación y contribuye a que el rendimiento reportado refleje de manera más fiel la capacidad de extrapolación del modelo.\\
+\begin{figure}[H]
+    \centering
+    % Subfigura lateral derecho
+    \begin{subfigure}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/resultados/pastel_tvt.png} \\
+        \caption{Porcentajes por subgrupo}
+        \label{subfig:cake-tvt}
+    \end{subfigure}
+    \hfill
+    % Subfigura central
+    \begin{subfigure}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/resultados/distancias-por-grupo.png} \\
+        \caption{Distribución de distancias por subgrupo}
+        \label{subfig:distances-tvt}
+    \end{subfigure}
+    \caption{Distribución de los subgrupos de entrenamiento, prueba y validación}
+    \label{fig:result_distr_tvt}
+\end{figure}
+La proporción resultante entre los subgrupos y la cobertura de los rangos de distancia en cada subconjunto se ilustran en la Figura \ref{fig:result_distr_tvt}, lo que permite verificar empíricamente tanto el balance de tamaños como la representatividad de las distancias.
 
-La función de pérdida utilizada es el error cuadrático medio (\texttt{MSE}) con el optimizador \texttt{Adam}; adicionalmente se monitorea también el error absoluto medio \texttt{MAE}. Con respecto a la regularización, se aplica \texttt{L2} de $5 \times 10^{-5}$  en las primeras dos capas recurrentes y de $1 \times 10^{-4}$ en las capas densas; se aplica \texttt{dropout} de $0.15$ para las primeras dos capas recurrentes y para las capas densas $0.25$ y $0.15$ respectivamente; también se implementaron mecanismos de regularización adaptativa mediante \texttt{EarlyStopping} y \texttt{ReduceLROnPlateau} de Keras. Las métricas de evaluación registradas son \texttt{MAE}, \texttt{MSE}, \texttt{RMSE}, \texttt{$R^{2}$}, \texttt{MAPE} y \texttt{$\sigma(AE)$}.
+\subsubsection{Normalización de características}
+La normalización se realizó después de la partición en \emph{train}, \emph{val} y \emph{test} descrita en la sección previa, empleando el escalado Min--Max calculado exclusivamente sobre los datos de entrenamiento. 
+Esta elección responde a la necesidad de conservar la distribución relativa de las dimensiones geométricas extraídas del \emph{bbox} y a la ventaja práctica de producir valores dentro de un rango acotado [0,1], lo que suele acelerar la convergencia y estabilizar el entrenamiento. Así mismo, al estimar los parámetros únicamente sobre \emph{train} se evita una fuga de información hacia los subconjuntos de validación y prueba, previniendo sesgos optimistas en la evaluación.
+
+Formalmente, denotando por \emph{x} una componente cualquiera de las características, el escalado aplicado es:
+
+\begin{equation}
+x' = \frac{x - x_{\min}}{x_{\max} - x_{\min} + \varepsilon},
+\label{eq:minmax}
+\end{equation}
+Donde \(\,x_{\min}\,\) y \(\,x_{\max}\,\) son el mínimo y el máximo de la característica calculados sobre todos los fotogramas contenidos en las ventanas del conjunto de entrenamiento, y \(\,\varepsilon\,\) es una constante pequeña \((\varepsilon = 10^{-8})\) para evitar divisiones por cero cuando \(x_{\min} = x_{\max}\).
+
+
+\subsection{Entrenamiento del modelo recurrente}
+En esta etapa se implementa y compara una arquitectura basada en LSTM y otra basada en GRU, ambas orientadas a la tarea de regresión de la distancia en metros a partir de las secuencias temporales generadas y de las características geométricas seleccionadas tras el análisis de correlación. A lo largo de la sección se describirá la estrategia de agrupación en lotes (\emph{batching}), la arquitectura de cada red, los hiperparámetros de entrenamiento y las métricas empleadas para la evaluación.
+\subsubsection{Procesamiento por lotes}
+Dada la naturaleza secuencial de las muestras, la estrategia de agrupación en lotes (\emph{batching}) se diseñó para preservar la coherencia temporal y evitar la mezcla de ventanas de distintos individuos dentro del mismo lote (\emph{batch}). Para ello se emplea una clase de generación de lotes (\emph{batches}) que agrupa las ventanas por \emph{target\_id} (cada batch contiene únicamente ventanas pertenecientes al mismo individuo). Este procedimiento facilita el aprendizaje de dinámicas temporales coherentes y permite controlar explícitamente el barajado a nivel de batches —barajado activo en entrenamiento y desactivado en validación—, contribuyendo a una evaluación más estable y representativa.
+
+\subsubsection{Configuración de entrenamiento y definición de hiperparámetros}
+La configuración de entrenamiento se definió de forma común para las dos variantes de arquitecturas (LSTM y GRU). En ella se establecen los criterios y parámetros que se mantendrán idénticos para permitir comparaciones controladas y reproducibles. \\
+El procedimiento de entrenamiento inicia con la carga de las secuencias de entrenamiento y validación, junto con sus etiquetas de distancia y los identificadores de individuo necesarios para la generación de los lotes. Estas secuencias se organizan mediante el esquema de batching descrito previamente: los lotes se mantienen homogéneos por \emph{target\_id} y sólo se barajan en el conjunto de entrenamiento. \\
+Una vez generados los lotes, se instancia el modelo recurrente correspondiente (LSTM o GRU) mediante una función constructora que recibe como parámetros la longitud de secuencia y el número de características. De esta forma, la estructura del entrenamiento permanece fija y únicamente la arquitectura interna del bloque recurrente varía entre experimentos.\\
+Para controlar el proceso de entrenamiento se emplean callbacks estándar pero afinados para el problema de regresión en distancia:
+\begin{itemize}
+  \item \raggedright \textbf{EarlyStopping} monitorizando \texttt{val\_mae} y recuperando los mejores pesos mediante \texttt{restore\_best\_weights}, con el fin de detener el entrenamiento cuando no se observe mejora y evitar sobreajuste.
+  \item \textbf{ReduceLROnPlateau} monitorizando \texttt{val\_mae}, para disminuir la tasa de aprendizaje cuando el progreso en validación se estabiliza.  
+  \item \textbf{ModelCheckpoint} para guardar el mejor modelo (formato \texttt{.keras}) durante el entrenamiento.
+  \item \textbf{CSVLogger} para conservar un registro de las métricas por época y facilitar análisis posteriores.
+\end{itemize}
+
+A modo de referencia, la configuración experimental de hiperparámetros usada en el presente trabajo se resume en la Tabla \ref{tab:hiperparametros_entrenamiento}.
+\begin{table}[H]
+\centering
+\begin{tabular}{ll}
+\hline
+Parámetro & Valor (por defecto) \\
+\hline
+Optimizer & Adam \\
+Learning rate inicial & $1\times 10^{-4}$ \\
+Loss & MSE \\
+Métrica principal & MAE \\
+Epochs máximas & 200 \\
+Batch size (seq. por batch) & 32 \\
+EarlyStopping (monitor) & val\_mae, patience=30, min\_delta=0.01 \\
+ReduceLROnPlateau & factor=0.5, patience=15, min\_lr=1e-7 \\
+ModelCheckpoint & guarda mejor val\_mae (.keras) \\
+CSVLogger & registra por-época training\_log.csv \\
+\hline
+\end{tabular}
+\caption{Hiperparámetros de entrenamiento.}
+\label{tab:hiperparametros_entrenamiento}
+\end{table}
+
+\subsubsection{Arquitectura GRU}
+La variante GRU utilizada en este trabajo intenta equilibrar capacidad de modelado temporal y simplicidad operativa. Dada la entrada temporal estructurada en ventanas y compuesta por dos variables por paso (las características geométricas seleccionadas durante el análisis); el procesamiento de dichas ventanas y el batching por \emph{target\_id} siguen el procedimiento descrito previamente en la sección de preprocesamiento y se ilustran de manera general en la Figura \ref{fig:gru_rnn}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{images/metodologia/rnnGru.png}
+    \caption{Arquitectura de la RNN basada en GRU}
+    \label{fig:gru_rnn}
+\end{figure}
+A partir de esa entrada, la red dispone de un único bloque recurrente GRU (en la implementación experimental con 128 unidades) que resume la dinámica temporal de cada ventana en un vector de estado final para obtener una representación compacta por ventana.\\
+La salida del bloque recurrente se proyecta a través de una capa densa intermedia de 64 unidades con activación ReLU, que aporta no linealidad y facilita la transformación de la representación temporal a un espacio más adecuado para la regresión. Tras esa capa densa se aplica regularización por \texttt{dropout} (en la configuración usada se fijó en 0.2) para mitigar el sobreajuste.\\
+Finalmente, la capa de salida consiste en una única neurona con activación lineal que produce la predicción continua de la distancia en metros, decisión coherente con el objetivo de regresión.
+
+\subsubsection{Arquitectura LSTM}
+La variante basada en LSTM parte de la misma estructura de entrada —ventanas temporales con dos características por paso— cuyo procesamiento y agrupamiento por \emph{target\_id} siguen exactamente el flujo de batching descrito; el esquema de la arquitectura se muestra en la Figura \ref{fig:rnnlstm}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{images/metodologia/rnnLSTM.png}
+    \caption{Arquitectura de la RNN basada en LSTM}
+    \label{fig:rnnlstm}
+\end{figure}
+A continuación, la secuencia entra a una única capa LSTM de 32 unidades (con \texttt{return\_sequences=False}), cuyo estado final resume la dinámica temporal de la ventana. La elección de un número reducido de unidades —en contraste con las 128 usadas en la variante GRU— se debe a que las LSTM tienen una estructura interna más compleja y costosa (compuertas y estado de celda), por lo que incrementar su dimensionalidad eleva significativamente el coste computacional. Al igual que en la arquitectura previa, se aplica regularización mediante \emph{dropout} (configurado en 0.1) tanto en las conexiones de entrada como en las recurrentes con el fin de mitigar sobreajuste sin incrementar la complejidad del modelo. \\
+La representación generada por el LSTM se proyecta finalmente a una capa densa de 16 unidades con activación \texttt{relu}, que actúa como transformación no lineal previa a la estimación. La salida corresponde a una única neurona lineal, para producir el valor continuo de distancia que el modelo debe predecir.

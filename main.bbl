@@ -1,0 +1,200 @@
+\begin{thebibliography}{30}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Agand et~al.(2024)Agand, Chang, and Chen]{agand2024dmode}
+P.~Agand, M.~Chang, and M.~Chen.
+\newblock Dmode: Differential monocular object distance estimation module
+  without class specific information.
+\newblock In \emph{2024 13th International Workshop on Robot Motion and Control
+  (RoMoCo)}, pages 261--266, 2024.
+
+\bibitem[Birchfield(1998)]{birchfield1998projective}
+S.~Birchfield.
+\newblock An introduction to projective geometry (for computer vision), March
+  1998.
+\newblock Unpublished manuscript.
+
+\bibitem[Bochkovskiy et~al.(2020)Bochkovskiy, Wang, and
+  Liao]{bochkovskiy2020yolov4}
+Alexey Bochkovskiy, Chien-Yao Wang, and Hong-Yuan~Mark Liao.
+\newblock Yolov4: Optimal speed and accuracy of object detection.
+\newblock \emph{arXiv:2004.10934}, 2020.
+
+\bibitem[Cho et~al.(2014)Cho, van Merri{\"e}nboer, G{\"u}l{\c{c}}ehre,
+  Bahdanau, Bougares, Schwenk, and Bengio]{cho2014learning}
+Kyunghyun Cho, Bart van Merri{\"e}nboer, {\c{C}}aglar G{\"u}l{\c{c}}ehre,
+  Dzmitry Bahdanau, Fethi Bougares, Holger Schwenk, and Yoshua Bengio.
+\newblock Learning phrase representations using {RNN} encoder--decoder for
+  statistical machine translation.
+\newblock In \emph{Proceedings of the 2014 Conference on Empirical Methods in
+  Natural Language Processing (EMNLP)}, pages 1724--1734. ACL, 2014.
+
+\bibitem[Geiger et~al.(2013)Geiger, Lenz, Stiller, and
+  Urtasun]{geiger2013kitti}
+A.~Geiger, P.~Lenz, C.~Stiller, and R.~Urtasun.
+\newblock Vision meets robotics: The kitti dataset.
+\newblock \emph{The International Journal of Robotics Research}, 32\penalty0
+  (11):\penalty0 1231--1237, 2013.
+
+\bibitem[Google(2025)]{Google}
+Google.
+\newblock Pixel phone hardware tech specs - pixel phone help, 2025.
+\newblock URL
+  \url{https://support.google.com/pixelphone/answer/7158570?hl=en#zippy=%2Cpixel-pro}.
+
+\bibitem[Hochreiter and Schmidhuber(1997)]{hochreiter1997long}
+Sepp Hochreiter and J{\"u}rgen Schmidhuber.
+\newblock Long short-term memory.
+\newblock \emph{Neural Computation}, 9\penalty0 (8):\penalty0 1735--1780, 1997.
+
+\bibitem[Kalman(1960)]{kalman1960new}
+Rudolph~Emil Kalman.
+\newblock A new approach to linear filtering and prediction problems.
+\newblock \emph{Transactions of the ASME--Journal of Basic Engineering},
+  82\penalty0 (1):\penalty0 35--45, 1960.
+
+\bibitem[Koledic et~al.(2023)Koledic, Markovic, and
+  Petrovic]{koledic2023invariant}
+Karlo Koledic, Ivan Markovic, and Ivan Petrovic.
+\newblock Towards camera-parameters invariant monocular depth estimation in
+  autonomous driving.
+\newblock In \emph{European Conference on Mobile Robots (ECMR)}, 2023.
+
+\bibitem[Kreuzig et~al.(2019)Kreuzig, Ochs, and Mester]{kreuzig2019distancenet}
+R.~Kreuzig, M.~Ochs, and R.~Mester.
+\newblock Distancenet: Estimating traveled distance from monocular images using
+  a recurrent convolutional neural network.
+\newblock arXiv preprint arXiv:1905.09957, 2019.
+
+\bibitem[Kuhn(1955)]{kuhn1955hungarian}
+Harold~W. Kuhn.
+\newblock The hungarian method for the assignment problem.
+\newblock \emph{Naval Research Logistics Quarterly}, 2\penalty0
+  (1--2):\penalty0 83--97, 1955.
+
+\bibitem[Li et~al.(2024)Li, Hu, Huang, Chen, Gao, Jiang, and
+  Zhang]{li2024synthetic}
+J.~Li, J.~Hu, Y.~Huang, Z.~Chen, B.~Gao, J.~Jiang, and Y.~Zhang.
+\newblock A synthetic digital city dataset for robustness and generalisation of
+  depth estimation models.
+\newblock \emph{Scientific Data}, 11:\penalty0 301, 2024.
+
+\bibitem[Liang et~al.(2022)Liang, Ma, and Zhang]{liang2022self}
+Hong Liang, Zizhen Ma, and Qian Zhang.
+\newblock Self-supervised object distance estimation using a monocular camera.
+\newblock \emph{Sensors}, 22\penalty0 (8):\penalty0 2936, 2022.
+\newblock \doi{10.3390/s22082936}.
+
+\bibitem[Mahalanobis(1936)]{mahalanobis1936generalised}
+Prasanta~Chandra Mahalanobis.
+\newblock On the generalised distance in statistics.
+\newblock \emph{Proceedings of the National Institute of Sciences of India},
+  2\penalty0 (1):\penalty0 49--55, 1936.
+
+\bibitem[Masoumian et~al.(2023)Masoumian, Marei, Abdulwahab, Cristiano, Puig,
+  and Rashwan]{masoumian2023absolute}
+Armin Masoumian, David G.~F. Marei, Saddam Abdulwahab, Julián Cristiano,
+  Domenec Puig, and Hatem~A. Rashwan.
+\newblock Absolute distance prediction based on deep learning object detection
+  and monocular depth estimation models.
+\newblock 2023.
+
+\bibitem[Niu et~al.(2021)Niu, Xu, Xu, Li, Huo, and Sun]{niu2021monocular}
+Y.~Niu, Z.~Xu, E.~Xu, G.~Li, Y.~Huo, and W.~Sun.
+\newblock Monocular pedestrian 3d localization for social distance monitoring.
+\newblock \emph{Sensors}, 21\penalty0 (17):\penalty0 5908, 2021.
+
+\bibitem[Pascanu et~al.(2013)Pascanu, Mikolov, and
+  Bengio]{pascanu2013difficulty}
+Razvan Pascanu, Tomas Mikolov, and Yoshua Bengio.
+\newblock On the difficulty of training recurrent neural networks.
+\newblock In \emph{Proceedings of the 30th International Conference on Machine
+  Learning (ICML)}, pages 1310--1318. PMLR, 2013.
+
+\bibitem[Shi et~al.(2021)Shi, Ye, Chen, Chen, Chen, and Kim]{shi2021geometry}
+Xuepeng Shi, Qi~Ye, Xiaozhi Chen, Chuangrong Chen, Zhixiang Chen, and Tae-Kyun
+  Kim.
+\newblock Geometry-based distance decomposition for monocular 3d object
+  detection.
+\newblock In \emph{Proceedings of the IEEE/CVF International Conference on
+  Computer Vision (ICCV)}, pages 15172--15181, 2021.
+\newblock \doi{10.1109/ICCV48922.2021.01474}.
+
+\bibitem[Szeliski(2022)]{szeliski2022computer}
+Richard Szeliski.
+\newblock \emph{Computer Vision: Algorithms and Applications}.
+\newblock Springer, Cham, Switzerland, 2nd edition, 2022.
+\newblock ISBN 978-3-031-01847-5.
+
+\bibitem[Ultralytics(2023)]{ultralytics2023yolov8}
+Ultralytics.
+\newblock Yolov8 documentation.
+\newblock \url{https://docs.ultralytics.com}, 2023.
+
+\bibitem[Velez(2025)]{Velez_2025}
+Ricardo Velez.
+\newblock ¿cuál es la estatura promedio de los mexicanos? datos revelados por
+  el inegi, Apr 2025.
+
+\bibitem[Wan et~al.(2022)Wan, Zhao, Guo, Xu, and Fang]{wan2022multi}
+Y.~Wan, Q.~Zhao, C.~Guo, C.~Xu, and L.~Fang.
+\newblock Multi-sensor fusion self-supervised deep odometry and depth
+  estimation.
+\newblock \emph{Remote Sensing}, 14\penalty0 (5):\penalty0 1228, 2022.
+
+\bibitem[Wojke et~al.(2017)Wojke, Bewley, and Paulus]{wojke2017simple}
+Nicolai Wojke, Alex Bewley, and Dietrich Paulus.
+\newblock Simple online and realtime tracking with a deep association metric.
+\newblock In \emph{2017 IEEE International Conference on Image Processing
+  (ICIP)}, pages 3645--3649. IEEE, 2017.
+
+\bibitem[Wu et~al.(2018)Wu, Ying, and
+  Zheng]{wu2018sizetodepthnewperspectivesingle}
+Yiran Wu, Sihao Ying, and Lianmin Zheng.
+\newblock Size-to-depth: A new perspective for single image depth estimation,
+  2018.
+\newblock URL \url{https://arxiv.org/abs/1801.04461}.
+
+\bibitem[Yang et~al.(2023)Yang, Tang, and Gao]{yang2023train}
+H.~Yang, T.~Tang, and C.~Gao.
+\newblock Train distance estimation in turnout area based on monocular vision.
+\newblock \emph{Sensors}, 23\penalty0 (21):\penalty0 8778, 2023.
+
+\bibitem[Z. et~al.(2017)Z., E., C., V., and C.]{magana2017estimacion}
+J.~B.~Magaña Z., J.~R.~Atoche E., J.~C.~Molina C., M.~Blanco V., and E.~Pérez
+  C.
+\newblock Estimación de la distancia a un objeto con visión computacional.
+\newblock 2017.
+\newblock Recibido: 30 de junio de 2017; Aprobado: 19 de septiembre de 2017.
+
+\bibitem[Zhao et~al.(2020)Zhao, Sun, Zhang, Tang, and Qian]{zhao2020monocular}
+Chaoqiang Zhao, Qiyu Sun, Chongzhen Zhang, Yang Tang, and Feng Qian.
+\newblock Monocular depth estimation based on deep learning: An overview.
+\newblock \emph{arXiv preprint arXiv:2003.06620v2}, 2020.
+\newblock URL \url{https://arxiv.org/abs/2003.06620}.
+\newblock Accessed: June 6, 2025.
+
+\bibitem[Zhe et~al.(2020)Zhe, Huang, Wu, Zhang, Pei, and Li]{zhe2020distance}
+T.~Zhe, L.~Huang, Q.~Wu, J.~Zhang, C.~Pei, and L.~Li.
+\newblock Inter-vehicle distance estimation method based on monocular vision
+  using 3d detection.
+\newblock \emph{IEEE Transactions on Vehicular Technology}, 69\penalty0
+  (5):\penalty0 4907--4919, May 2020.
+
+\bibitem[Zhu and Fang(2019)]{zhu2019objectdistance}
+J.~Zhu and Y.~Fang.
+\newblock Learning object-specific distance from a monocular image.
+\newblock In \emph{Proceedings of the IEEE/CVF International Conference on
+  Computer Vision}, pages 3839--3848, 2019.
+
+\bibitem[Zhu et~al.(2019)Zhu, Fang, Abu-Haimed, Lien, Fu, and
+  Gu]{zhu2019monocular}
+Jing Zhu, Yi~Fang, Husam Abu-Haimed, Kuo-Chin Lien, Dongdong Fu, and Junli Gu.
+\newblock Learning object-specific distance from a monocular image.
+\newblock \emph{arXiv preprint arXiv:1909.04182}, 2019.
+
+\end{thebibliography}

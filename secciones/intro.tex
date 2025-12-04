@@ -5,7 +5,8 @@
 
 La estimación de distancias es fundamental para el funcionamiento seguro y eficiente de sistemas móviles y autónomos, como vehículos autónomos, robots móviles y asistentes personales, y se realiza tradicionalmente mediante sistemas de imágenes estéreo, multicámara o mediciones LiDAR. Sin embargo, estos enfoques presentan limitaciones en términos de costo, casos de uso, sincronización, complejidad de equipamiento y consumo energético \cite{agand2024dmode}.  En contraste, la visión monocular, potenciada por avances en aprendizaje profundo, ha emergido como una alternativa viable y más accesible, permitiendo la estimación de profundidad a partir de una única imagen RGB . \cite{zhao2020monocular}.\\
 En la actualidad, los avances en visión computacional monocular han permitido desarrollar sistemas capaces de interpretar información visual de manera automatizada. Se han realizado estudios sobre la estimación de distancias entre vehículos \cite{zhe2020distance}, así como otros que amplían el análisis a múltiples objetos y entornos, aunque todavía se basan en perspectivas vehículares \cite{zhu2019objectdistance}. También existen enfoques basados en análisis geométrico que pueden escalarse a distintos objetos y escenarios \cite{shi2021geometry}. Sin embargo, a pesar de los avances y los buenos resultados obtenidos, los videos y conjuntos de datos utilizados siguen predominando en contextos de movimiento y captura vehicular, destacando el conjunto de datos de detección de objetos KITTI \cite{geiger2013kitti}, que fue recopilado desde una camioneta.\\
-En este contexto, el proyecto desarrolla y valida un sistema de estimación de distancias a partir de video monocular filmado desde la perspectiva de un peatón, integrando un enfoque geométrico que aprovecha la altura real de los sujetos y los parámetros intrínsecos de la cámara, a partir de los cuales se construyó un conjunto de datos propio; el análisis estadístico de esas mediciones mostró que características visuales como la altura en píxeles y la coordenada vertical del centro del cuadro envolvente de cada persona correlacionan de manera consistente con la distancia real, lo cual orientó la selección de entradas del modelo. Sobre esa base se diseñó y entrenó una arquitectura recurrente para realizar regresión de distancia en secuencias temporales, y se integró un detector YOLOv8 —sin reentrenamiento— para localizar peatones en cada cuadro y alimentar el sistema. Los resultados experimentales, muestran la capacidad del enfoque para generalizar a personas de alturas variables en escenarios dinámicos y establecen las métricas de error y limitaciones que guían futuras mejoras.   
+En este contexto, el proyecto desarrolla y valida un sistema de estimación de distancias a partir de video monocular filmado desde la perspectiva de un peatón, integrando un enfoque geométrico que aprovecha la altura real de los sujetos y los parámetros intrínsecos de la cámara, a partir de los cuales se construyó un conjunto de datos propio; el análisis estadístico de esas mediciones mostró que características visuales como la altura en píxeles y la coordenada vertical del centro del cuadro envolvente de cada persona correlacionan de manera consistente con la distancia real, lo cual orientó la selección de entradas del modelo.
+Sobre esa base se diseñaron e implementaron dos variantes de arquitectura recurrente (una basada en GRU y otra en LSTM) que fueron entrenadas para la regresión de distancia en secuencias temporales, y se integró un detector YOLOv8 —sin reentrenamiento— para localizar peatones en cada cuadro y alimentar el sistema. Los resultados experimentales, muestran la capacidad del enfoque para generalizar a personas de alturas variables en escenarios dinámicos y establecen las métricas de error y limitaciones que guían futuras mejoras.   
 
 \subsection{Antecedentes}
 
@@ -73,8 +74,8 @@ Evaluar la eficacia de un sistema de estimación de distancias en entornos diná
 \textbf{Objetivos específicos}
 \begin{itemize}
     \item Generar un conjunto de datos propio compuesto por secuencias de video capturadas desde la perspectiva de un peatón, que sirviera como base para el entrenamiento, validación y análisis del sistema propuesto.
-    \item Integrar y ajustar componentes de detección, seguimiento y estimación de distancia dentro de un marco de visión monocular, considerando la influencia del movimiento tanto de la cámara como de los objetos presentes en la escena.
-    \item Analizar el rendimiento del sistema desarrollado mediante métricas cuantitativas (\textit{AbsRel}, \textit{RMSE} y \textit{threshold accuracy}) y la comparación de resultados frente a valores de referencia obtenidos experimentalmente.
+    \item Explorar dos variantes de modelado temporal mediante redes recurrentes para la estimación de distancia en un marco de visión monocular, considerando las variaciones propias del movimiento en la escena.
+    \item Analizar el rendimiento del sistema desarrollado mediante métricas cuantitativas (\textit{MAE}, \textit{MAPE}, \textit{RMSE} y \textit{R$^2$}) y la comparación de resultados frente a valores de referencia obtenidos experimentalmente.
 \end{itemize}
 
 \subsubsection{Justificación}
@@ -82,37 +83,24 @@ Evaluar la eficacia de un sistema de estimación de distancias en entornos diná
 La detección y estimación de distancias de objetos en entornos dinámicos es fundamental para mejorar la seguridad y la eficiencia de sistemas móviles. Aunque existen soluciones basadas en sensores especializados como LiDAR o sistemas estéreo, estos suelen implicar un costo elevado, mayor consumo energético y limitaciones de integración en dispositivos ligeros. Por otro lado, las metodologías puramente monoculares ofrecen una alternativa más accesible, aunque presentan dificultades para obtener estimaciones métricas precisas, especialmente cuando la cámara se encuentra en movimiento y las condiciones de captura difieren de las utilizadas durante el entrenamiento de los modelos.\\
 En este sentido, en el trabajo presente se propone abordar dicha brecha mediante \begin{enumerate}
     \item la captura y anotación de un dataset propio, recolectado con la cámara y resolución reales del sistema objetivo
-    \item el entrenamiento supervisado de una arquitectura recurrente híbrida diseñada para explotar dependencias temporales y aprender una transformación hacia una escala métrica ajustada a nuestras condiciones de captura.
+    \item el entrenamiento supervisado de dos enfoques basados en redes recurrentes (GRU y LSTM) para modelar la dinámica temporal y aproximar la distancia en escala métrica.
 \end{enumerate}
-Con ello se busca analizar hasta qué punto un enfoque supervisado y adaptado al dominio específico de la cámara puede mejorar la coherencia métrica frente a modelos genéricos entrenados en otros dominios o a aproximaciones auto-supervisadas no ajustadas.
+De esta forma, se busca determinar el grado en que modelos supervisados ajustados al dominio específico pueden superar las inconsistencias métricas de aproximaciones de propósito general.
 
 \subsection{Hipótesis}
 
-La estimación inicial de distancias, obtenida a partir de los parámetros intrínsecos de la cámara y de características observables de los sujetos en el entorno, permite establecer una aproximación métrica que sirve como base para el entrenamiento supervisado de una arquitectura recurrente híbrida. Se plantea que, al incorporar dependencias temporales presentes en las secuencias de video y aprovechar la variabilidad de altura entre los distintos sujetos, el modelo puede aprender una representación más generalizable y coherente de la escala métrica, mejorando la precisión de las estimaciones de distancia en escenas dinámicas capturadas con cámara monocular.
-
+La estimación inicial de distancias, derivada de los parámetros intrínsecos de la cámara y de características observables de los sujetos en la escena, establece una aproximación métrica útil que sirve como base para el entrenamiento supervisado; al alimentar con secuencias de video (es decir, aprovechando las dependencias temporales entre fotogramas) modelos recurrentes, el sistema puede aprender una representación de la escala métrica más estable y generalizable frente a la variabilidad de altura entre individuos, mejorando así la precisión de las estimaciones de distancia en escenarios dinámicos registrados con una cámara monocular.
 \subsection{Aportación científica y/o tecnológica}
 
  El presente trabajo plantea como aportación principal el desarrollo y validación de un modelo de percepción visual basado en visión computacional monocular, orientado a la estimación métrica absoluta de distancias a transeúntes en entornos dinámicos. A diferencia de enfoques genéricos entrenados en dominios externos o con sensores especializados, el sistema propuesto se construyó a partir de la captura y anotación de un dataset propio, grabado con la cámara y resolución reales del sistema objetivo, lo que permitió ajustar el modelo a las condiciones particulares de observación y movimiento.
 
-Como eje metodológico, el proyecto integra una etapa de estimación inicial basada en parámetros intrínsecos de la cámara y características físicas observables de los sujetos, seguida por un entrenamiento supervisado de una arquitectura recurrente híbrida (GRU–LSTM–GRU), diseñada para aprovechar la información temporal de las secuencias de video. Esta combinación permitió explorar el potencial de las redes recurrentes para refinar la coherencia métrica y mejorar la generalización del modelo ante personas de diferentes alturas y posiciones dentro de la escena.
+Como eje metodológico, se combina una estimación inicial métrica basada en parámetros de la cámara con el entrenamiento supervisado de dos variantes recurrentes (GRU y LSTM) sobre secuencias de video; esto permitió explorar cómo la información temporal contribuye a mejorar la coherencia y la generalización de las estimaciones de distancia en escenas dinámicas.
 
 El trabajo constituye así una aportación tecnológica y experimental al demostrar la viabilidad de obtener estimaciones métricas de profundidad con una sola cámara, sin recurrir a sensores costosos como LiDAR o configuraciones estéreo.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\linewidth]{images/FDI1.pdf}
-    \caption{Esquema de funcionamiento}
+    \caption{Flujo de trabajo}
     \label{fig:blockDia}
 \end{figure}
-
-\subsection{Organización del proyecto técnico}
-%El presente proyecto técnico se estructura en cuatro capítulos principales. En el Capítulo \ref{cap-intro}, se expone la introducción general al tema, incluyendo los antecedentes, la definición del problema, los objetivos, la justificación, la hipótesis, así como la aportación científica y tecnológica esperada.\\
-
-El Capítulo \ref{cap-marcot} se desarrolla el marco teórico, donde se describen los fundamentos conceptuales relacionados con la visión computacional, los enfoques monoculares, la estimación de profundidad y sus retos, \begin{comment}
-    el movimiento desde la percepción de la cámara (ego-motion), la detección de objetos y el análisis de escenas dinámicas. Esta sección proporciona el contexto técnico y académico necesario para sustentar el desarrollo del proyecto.\\
-\end{comment}
-En el Capítulo \ref{cap-metodo}, se presenta la metodología propuesta implementada\begin{comment}
-    el sistema de detección de objetos y estimación de distancias, desglosando cada una de las etapas del proceso, desde la recolección de datos hasta la validación del sistema en escenarios dinámicos.\\
-\end{comment} 
-Capitulo de resultados 
-Finalmente, en el Capítulo \ref{cap-result} se incluirán las conclusiones obtenidas a partir del desarrollo del trabajo y la evaluación experimental, así como observaciones sobre posibles mejoras y aplicaciones futuras. El documento cierra con la sección de referencias que respalda el contenido técnico y científico del reporte.

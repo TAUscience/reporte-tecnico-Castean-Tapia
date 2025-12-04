@@ -1,0 +1,200 @@
+\relax 
+\providecommand\babel@aux[2]{}
+\@nameuse{bbl@beforestart}
+\catcode `"\active 
+\catcode `<\active 
+\catcode `>\active 
+\@nameuse{es@quoting}
+\providecommand\hyper@newdestlabel[2]{}
+\providecommand\HyField@AuxAddToFields[1]{}
+\providecommand\HyField@AuxAddToCoFields[2]{}
+\babel@aux{spanish}{}
+\citation{agand2024dmode}
+\citation{zhao2020monocular}
+\citation{zhe2020distance}
+\citation{zhu2019objectdistance}
+\citation{shi2021geometry}
+\citation{geiger2013kitti}
+\@writefile{toc}{\contentsline {section}{\numberline {1}Introducción}{4}{section.1}\protected@file@percent }
+\newlabel{cap-intro}{{1}{4}{Introducción}{section.1}{}}
+\citation{liang2022self}
+\citation{zhu2019monocular}
+\citation{masoumian2023absolute}
+\citation{magana2017estimacion}
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.1}Antecedentes}{5}{subsection.1.1}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Comparativa de trabajos relacionados en estimación de distancia con cámara monocular.}}{5}{table.caption.3}\protected@file@percent }
+\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
+\newlabel{tab:estimacion_distancia}{{1}{5}{Comparativa de trabajos relacionados en estimación de distancia con cámara monocular}{table.caption.3}{}}
+\citation{yang2023train}
+\citation{niu2021monocular}
+\citation{li2024synthetic}
+\citation{wan2022multi}
+\citation{kreuzig2019distancenet}
+\citation{koledic2023invariant}
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.2}Planteamiento del problema}{6}{subsection.1.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.2.1}Definición del problema}{6}{subsubsection.1.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.2.2}Objetivos}{7}{subsubsection.1.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.2.3}Justificación}{8}{subsubsection.1.2.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.3}Hipótesis}{9}{subsection.1.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.4}Aportación científica y/o tecnológica}{9}{subsection.1.4}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Flujo de trabajo}}{10}{figure.caption.4}\protected@file@percent }
+\newlabel{fig:blockDia}{{1}{10}{Flujo de trabajo}{figure.caption.4}{}}
+\citation{birchfield1998projective}
+\@writefile{toc}{\contentsline {section}{\numberline {2}Marco Teórico}{11}{section.2}\protected@file@percent }
+\newlabel{cap-marcot}{{2}{11}{Marco Teórico}{section.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Visión Computacional}{11}{subsection.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.1.1}Visión Monocular}{11}{subsubsection.2.1.1}\protected@file@percent }
+\citation{szeliski2022computer}
+\citation{shi2021geometry}
+\citation{bochkovskiy2020yolov4}
+\newlabel{eq:pinhole}{{1}{12}{Visión Monocular}{equation.2.1}{}}
+\newlabel{eq:projection_basic}{{2}{12}{Visión Monocular}{equation.2.2}{}}
+\newlabel{eq:distance_relation}{{3}{12}{Visión Monocular}{equation.2.3}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.1.2}Modelo de Detección: YOLOv8}{12}{subsubsection.2.1.2}\protected@file@percent }
+\citation{ultralytics2023yolov8}
+\citation{ultralytics2023yolov8}
+\citation{wojke2017simple}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.1.3}Modelo de seguimiento: DeepSORT}{13}{subsubsection.2.1.3}\protected@file@percent }
+\citation{wojke2017simple}
+\citation{kalman1960new}
+\citation{mahalanobis1936generalised}
+\citation{kuhn1955hungarian}
+\citation{wojke2017simple}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Redes Neuronales Recurrentes}{15}{subsection.2.2}\protected@file@percent }
+\citation{pascanu2013difficulty}
+\newlabel{eq:rnn_state}{{11}{16}{Redes Neuronales Recurrentes}{equation.2.11}{}}
+\newlabel{eq:rnn_output}{{12}{16}{Redes Neuronales Recurrentes}{equation.2.12}{}}
+\newlabel{eq:seq_loss}{{13}{16}{Redes Neuronales Recurrentes}{equation.2.13}{}}
+\citation{hochreiter1997long}
+\citation{cho2014learning}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.2.1}LSTM (Long Short-Term Memory)}{17}{subsubsection.2.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.2.2}GRU (Gated Recurrent Unit)}{17}{subsubsection.2.2.2}\protected@file@percent }
+\citation{Velez_2025}
+\@writefile{toc}{\contentsline {section}{\numberline {3}Metodología}{18}{section.3}\protected@file@percent }
+\newlabel{cap-metodo}{{3}{18}{Metodología}{section.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Recolección de datos}{18}{subsection.3.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Esquema de grabación}}{19}{figure.caption.5}\protected@file@percent }
+\newlabel{fig:diag_fija}{{2}{19}{Esquema de grabación}{figure.caption.5}{}}
+\newlabel{subfig:table-data}{{3a}{19}{Tabla}{figure.caption.6}{}}
+\newlabel{sub@subfig:table-data}{{a}{19}{Tabla}{figure.caption.6}{}}
+\newlabel{subfig:histogram-heighs}{{3b}{19}{Histograma}{figure.caption.6}{}}
+\newlabel{sub@subfig:histogram-heighs}{{b}{19}{Histograma}{figure.caption.6}{}}
+\newlabel{subfig:box-heighs-persons}{{3c}{19}{Gráfico de caja}{figure.caption.6}{}}
+\newlabel{sub@subfig:box-heighs-persons}{{c}{19}{Gráfico de caja}{figure.caption.6}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Alturas registradas de los voluntarios para la grabación de video, se presentan un histograma y un gráfico de caja para analizar las características de los datos}}{19}{figure.caption.6}\protected@file@percent }
+\newlabel{fig:datos_altura}{{3}{19}{Alturas registradas de los voluntarios para la grabación de video, se presentan un histograma y un gráfico de caja para analizar las características de los datos}{figure.caption.6}{}}
+\citation{wu2018sizetodepthnewperspectivesingle}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Generación del conjunto de datos}{20}{subsection.3.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Pasos para etiquetar los videos y obtener anotaciones en CSV}}{20}{figure.caption.7}\protected@file@percent }
+\newlabel{fig:diag_etiquetado}{{4}{20}{Pasos para etiquetar los videos y obtener anotaciones en CSV}{figure.caption.7}{}}
+\citation{Google}
+\newlabel{eq:distancia}{{24}{21}{Generación del conjunto de datos}{equation.3.24}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Parámetros intrínsecos utilizados para la estimación de distancia.}}{21}{table.caption.8}\protected@file@percent }
+\newlabel{tab:intrinsec}{{2}{21}{Parámetros intrínsecos utilizados para la estimación de distancia}{table.caption.8}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Resumen de la precisión por punto de referencia (mediana de las predicciones por punto).}}{22}{table.caption.9}\protected@file@percent }
+\newlabel{tab:err}{{3}{22}{Resumen de la precisión por punto de referencia (mediana de las predicciones por punto)}{table.caption.9}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Dispersión del error absoluto \(|d_{\text  {pred}} - d_{\text  {gt}}|\) respecto a la distancia real \(d_{\text  {gt}}\).}}{22}{figure.caption.10}\protected@file@percent }
+\newlabel{fig:abserr}{{5}{22}{Dispersión del error absoluto \(|d_{\text {pred}} - d_{\text {gt}}|\) respecto a la distancia real \(d_{\text {gt}}\)}{figure.caption.10}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Distribución final de anotaciones por metro}}{23}{figure.caption.11}\protected@file@percent }
+\newlabel{fig:dataDist}{{6}{23}{Distribución final de anotaciones por metro}{figure.caption.11}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Análisis y Preprocesamiento de datos}{24}{subsection.3.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Etapas de tratamiento de las anotaciones}}{24}{figure.caption.12}\protected@file@percent }
+\newlabel{fig:diag_preprocess}{{7}{24}{Etapas de tratamiento de las anotaciones}{figure.caption.12}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.3.1}Depuración de datos}{24}{subsubsection.3.3.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.3.2}Análisis de datos}{25}{subsubsection.3.3.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces Matriz de correlación entre características geométricas y distancia}}{26}{figure.caption.13}\protected@file@percent }
+\newlabel{fig:dataCorr}{{8}{26}{Matriz de correlación entre características geométricas y distancia}{figure.caption.13}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.3.3}Segmentación temporal}{27}{subsubsection.3.3.3}\protected@file@percent }
+\newlabel{eq:n_ventanas}{{25}{27}{Segmentación temporal}{equation.3.25}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces Número de ventanas generadas por individuo-video}}{28}{figure.caption.14}\protected@file@percent }
+\newlabel{fig:windowsGen}{{9}{28}{Número de ventanas generadas por individuo-video}{figure.caption.14}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.3.4}Partición del conjunto de datos}{28}{subsubsection.3.3.4}\protected@file@percent }
+\newlabel{subfig:cake-tvt}{{10a}{29}{Porcentajes por subgrupo}{figure.caption.15}{}}
+\newlabel{sub@subfig:cake-tvt}{{a}{29}{Porcentajes por subgrupo}{figure.caption.15}{}}
+\newlabel{subfig:distances-tvt}{{10b}{29}{Distribución de distancias por subgrupo}{figure.caption.15}{}}
+\newlabel{sub@subfig:distances-tvt}{{b}{29}{Distribución de distancias por subgrupo}{figure.caption.15}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces Distribución de los subgrupos de entrenamiento, prueba y validación}}{29}{figure.caption.15}\protected@file@percent }
+\newlabel{fig:result_distr_tvt}{{10}{29}{Distribución de los subgrupos de entrenamiento, prueba y validación}{figure.caption.15}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.3.5}Normalización de características}{29}{subsubsection.3.3.5}\protected@file@percent }
+\newlabel{eq:minmax}{{26}{30}{Normalización de características}{equation.3.26}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.4}Entrenamiento del modelo recurrente}{30}{subsection.3.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.4.1}Procesamiento por lotes}{30}{subsubsection.3.4.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.4.2}Configuración de entrenamiento y definición de hiperparámetros}{30}{subsubsection.3.4.2}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Hiperparámetros de entrenamiento.}}{32}{table.caption.16}\protected@file@percent }
+\newlabel{tab:hiperparametros_entrenamiento}{{4}{32}{Hiperparámetros de entrenamiento}{table.caption.16}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.4.3}Arquitectura GRU}{32}{subsubsection.3.4.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {11}{\ignorespaces Arquitectura de la RNN basada en GRU}}{32}{figure.caption.17}\protected@file@percent }
+\newlabel{fig:gru_rnn}{{11}{32}{Arquitectura de la RNN basada en GRU}{figure.caption.17}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.4.4}Arquitectura LSTM}{33}{subsubsection.3.4.4}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {12}{\ignorespaces Arquitectura de la RNN basada en LSTM}}{33}{figure.caption.18}\protected@file@percent }
+\newlabel{fig:rnnlstm}{{12}{33}{Arquitectura de la RNN basada en LSTM}{figure.caption.18}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Resultados}{35}{section.4}\protected@file@percent }
+\newlabel{cap-result}{{4}{35}{Resultados}{section.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Dinámica de entrenamiento}{35}{subsection.4.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {13}{\ignorespaces Evolución de la pérdida (MSE) durante el entrenamiento para GRU (izquierda) y LSTM (derecha).}}{35}{figure.caption.19}\protected@file@percent }
+\newlabel{fig:training_curves}{{13}{35}{Evolución de la pérdida (MSE) durante el entrenamiento para GRU (izquierda) y LSTM (derecha)}{figure.caption.19}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Evaluación en conjunto de prueba}{36}{subsection.4.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.2.1}Métricas globales}{36}{subsubsection.4.2.1}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces Comparativa de métricas globales en el conjunto de prueba para las variantes LSTM y GRU.}}{36}{table.caption.20}\protected@file@percent }
+\newlabel{tab:metrics_comparison}{{5}{36}{Comparativa de métricas globales en el conjunto de prueba para las variantes LSTM y GRU}{table.caption.20}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.2.2}Visualización de resultados}{36}{subsubsection.4.2.2}\protected@file@percent }
+\newlabel{subfig:gru_pred_vs_real}{{14a}{37}{\relax }{figure.caption.21}{}}
+\newlabel{sub@subfig:gru_pred_vs_real}{{a}{37}{\relax }{figure.caption.21}{}}
+\newlabel{subfig:gru_err_hist}{{14b}{37}{\relax }{figure.caption.21}{}}
+\newlabel{sub@subfig:gru_err_hist}{{b}{37}{\relax }{figure.caption.21}{}}
+\newlabel{subfig:gru_abs_err_hist}{{14c}{37}{\relax }{figure.caption.21}{}}
+\newlabel{sub@subfig:gru_abs_err_hist}{{c}{37}{\relax }{figure.caption.21}{}}
+\newlabel{subfig:lstm_pred_vs_real}{{14d}{37}{\relax }{figure.caption.21}{}}
+\newlabel{sub@subfig:lstm_pred_vs_real}{{d}{37}{\relax }{figure.caption.21}{}}
+\newlabel{subfig:lstm_err_hist}{{14e}{37}{\relax }{figure.caption.21}{}}
+\newlabel{sub@subfig:lstm_err_hist}{{e}{37}{\relax }{figure.caption.21}{}}
+\newlabel{subfig:lstm_abs_err_hist}{{14f}{37}{\relax }{figure.caption.21}{}}
+\newlabel{sub@subfig:lstm_abs_err_hist}{{f}{37}{\relax }{figure.caption.21}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {14}{\ignorespaces Comparativa visual del desempeño en test: fila superior = GRU; fila inferior = LSTM. (a)/(d) Predicción vs.\ Real con línea identidad; (b)/(e) histograma de errores (\( \text  {Pred} - \text  {Real} \)); (c)/(f) histograma de errores absolutos.}}{37}{figure.caption.21}\protected@file@percent }
+\newlabel{fig:results_gru_lstm}{{14}{37}{Comparativa visual del desempeño en test: fila superior = GRU; fila inferior = LSTM. (a)/(d) Predicción vs.\ Real con línea identidad; (b)/(e) histograma de errores (\( \text {Pred} - \text {Real} \)); (c)/(f) histograma de errores absolutos}{figure.caption.21}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Inferencia del modelo sobre videos}{38}{subsection.4.3}\protected@file@percent }
+\newlabel{subfig:vid-1}{{\caption@xref {subfig:vid-1}{ on input line 102}}{38}{Inferencia del modelo sobre videos}{figure.caption.22}{}}
+\newlabel{sub@subfig:vid-1}{{}{38}{Inferencia del modelo sobre videos}{figure.caption.22}{}}
+\newlabel{subfig:vid-2}{{\caption@xref {subfig:vid-2}{ on input line 109}}{38}{Inferencia del modelo sobre videos}{figure.caption.22}{}}
+\newlabel{sub@subfig:vid-2}{{}{38}{Inferencia del modelo sobre videos}{figure.caption.22}{}}
+\newlabel{subfig:vid-3}{{\caption@xref {subfig:vid-3}{ on input line 118}}{38}{Inferencia del modelo sobre videos}{figure.caption.22}{}}
+\newlabel{sub@subfig:vid-3}{{}{38}{Inferencia del modelo sobre videos}{figure.caption.22}{}}
+\newlabel{subfig:vid-4}{{\caption@xref {subfig:vid-4}{ on input line 125}}{38}{Inferencia del modelo sobre videos}{figure.caption.22}{}}
+\newlabel{sub@subfig:vid-4}{{}{38}{Inferencia del modelo sobre videos}{figure.caption.22}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {15}{\ignorespaces Frames de resultado tras aplicar el modelo de red neuronal sobre videos}}{38}{figure.caption.22}\protected@file@percent }
+\newlabel{fig:result_videos}{{15}{38}{Frames de resultado tras aplicar el modelo de red neuronal sobre videos}{figure.caption.22}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Conclusiones}{39}{section.5}\protected@file@percent }
+\bibstyle{plainnat}
+\bibdata{referencias}
+\bibcite{agand2024dmode}{{1}{2024}{{Agand et~al.}}{{Agand, Chang, and Chen}}}
+\bibcite{birchfield1998projective}{{2}{1998}{{Birchfield}}{{}}}
+\bibcite{bochkovskiy2020yolov4}{{3}{2020}{{Bochkovskiy et~al.}}{{Bochkovskiy, Wang, and Liao}}}
+\bibcite{cho2014learning}{{4}{2014}{{Cho et~al.}}{{Cho, van Merri{\"e}nboer, G{\"u}l{\c {c}}ehre, Bahdanau, Bougares, Schwenk, and Bengio}}}
+\bibcite{geiger2013kitti}{{5}{2013}{{Geiger et~al.}}{{Geiger, Lenz, Stiller, and Urtasun}}}
+\bibcite{Google}{{6}{2025}{{Google}}{{}}}
+\bibcite{hochreiter1997long}{{7}{1997}{{Hochreiter and Schmidhuber}}{{}}}
+\bibcite{kalman1960new}{{8}{1960}{{Kalman}}{{}}}
+\bibcite{koledic2023invariant}{{9}{2023}{{Koledic et~al.}}{{Koledic, Markovic, and Petrovic}}}
+\bibcite{kreuzig2019distancenet}{{10}{2019}{{Kreuzig et~al.}}{{Kreuzig, Ochs, and Mester}}}
+\bibcite{kuhn1955hungarian}{{11}{1955}{{Kuhn}}{{}}}
+\bibcite{li2024synthetic}{{12}{2024}{{Li et~al.}}{{Li, Hu, Huang, Chen, Gao, Jiang, and Zhang}}}
+\bibcite{liang2022self}{{13}{2022}{{Liang et~al.}}{{Liang, Ma, and Zhang}}}
+\bibcite{mahalanobis1936generalised}{{14}{1936}{{Mahalanobis}}{{}}}
+\bibcite{masoumian2023absolute}{{15}{2023}{{Masoumian et~al.}}{{Masoumian, Marei, Abdulwahab, Cristiano, Puig, and Rashwan}}}
+\bibcite{niu2021monocular}{{16}{2021}{{Niu et~al.}}{{Niu, Xu, Xu, Li, Huo, and Sun}}}
+\bibcite{pascanu2013difficulty}{{17}{2013}{{Pascanu et~al.}}{{Pascanu, Mikolov, and Bengio}}}
+\bibcite{shi2021geometry}{{18}{2021}{{Shi et~al.}}{{Shi, Ye, Chen, Chen, Chen, and Kim}}}
+\bibcite{szeliski2022computer}{{19}{2022}{{Szeliski}}{{}}}
+\bibcite{ultralytics2023yolov8}{{20}{2023}{{Ultralytics}}{{}}}
+\bibcite{Velez_2025}{{21}{2025}{{Velez}}{{}}}
+\bibcite{wan2022multi}{{22}{2022}{{Wan et~al.}}{{Wan, Zhao, Guo, Xu, and Fang}}}
+\bibcite{wojke2017simple}{{23}{2017}{{Wojke et~al.}}{{Wojke, Bewley, and Paulus}}}
+\bibcite{wu2018sizetodepthnewperspectivesingle}{{24}{2018}{{Wu et~al.}}{{Wu, Ying, and Zheng}}}
+\bibcite{yang2023train}{{25}{2023}{{Yang et~al.}}{{Yang, Tang, and Gao}}}
+\bibcite{magana2017estimacion}{{26}{2017}{{Z. et~al.}}{{Z., E., C., V., and C.}}}
+\bibcite{zhao2020monocular}{{27}{2020}{{Zhao et~al.}}{{Zhao, Sun, Zhang, Tang, and Qian}}}
+\bibcite{zhe2020distance}{{28}{2020}{{Zhe et~al.}}{{Zhe, Huang, Wu, Zhang, Pei, and Li}}}
+\bibcite{zhu2019objectdistance}{{29}{2019}{{Zhu and Fang}}{{}}}
+\bibcite{zhu2019monocular}{{30}{2019}{{Zhu et~al.}}{{Zhu, Fang, Abu-Haimed, Lien, Fu, and Gu}}}
+\@writefile{toc}{\contentsline {section}{Referencias}{43}{section*.23}\protected@file@percent }
+\gdef \@abspage@last{44}

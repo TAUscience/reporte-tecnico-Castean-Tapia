@@ -1,0 +1,49 @@
+\section{Estado del arte}
+\label{cap-stateart}
+
+\begin{table}[H]
+\centering
+\footnotesize
+
+\begin{tabularx}{\linewidth}{@{}p{2cm} X X@{}}
+\toprule
+\textbf{Referencia} & \textbf{Contribuciones} & \textbf{Limitaciones} \\
+\midrule
+
+\cite{liang2022self} &
+Integran YOLO y ShuffleNet en un esquema auto-supervisado para estimación de distancia específica de objetos; validado en KITTI mostrando mejoras prácticas en precisión. &
+Ausencia de métricas cuantitativas detalladas; validación limitada a escenarios acotados. \\
+\addlinespace[7pt]
+
+\cite{zhu2019monocular} &
+Modelo end-to-end con YOLOv5 y autoencoder con pérdida de proyección; obtiene mejoras en métricas como RMSE y AbsRel. &
+Consumo computacional elevado; disminución del rendimiento en escenas con pendientes o geometría irregular. \\
+\addlinespace[7pt]
+
+\cite{masoumian2023absolute} &
+Combina YOLOv5 y autoencoder con pérdidas geométricas, alcanzando 96\% de precisión y 0.203 como RMSE; robusto en entornos complejos al enfocarse en objetos detectados. &
+No considera dinámicas entre cámara y objetos; pruebas realizadas solo en escenas estáticas. \\
+\addlinespace[7pt]
+
+\cite{magana2017estimacion} &
+Sistema auto-supervisado con calibración monocular y enfoque multi-escala; logra error del 0.99\%, $\sigma$ de 0.1\% y un 96.1\% de éxito, manteniendo bajo costo computacional. &
+Rendimiento disminuye ante movimientos impredecibles u oclusión significativa. \\
+\addlinespace[7pt]
+
+\bottomrule
+\end{tabularx}
+
+\caption{Comparativa de trabajos relacionados en estimación de distancia con cámara monocular.}
+\label{tab:estimacion_distancia}
+\end{table}
+
+En los últimos años, la visión computacional monocular ha experimentado avances notables en la comprensión tridimensional de escenas. La estimación de profundidad a partir de una sola imagen ha sido el enfoque predominante para inferir la estructura espacial del entorno. Sin embargo, es crucial distinguir entre la estimación de profundidad y la estimación de distancias: mientras que la primera busca reconstruir un mapa de profundidad de la escena, la segunda se centra en calcular la separación métrica entre la cámara y objetos específicos, lo cual es esencial para tareas como la navegación autónoma y la prevención de colisiones.\\
+
+Frente a este panorama, diversos estudios recientes han abordado el problema de la estimación de distancias desde una perspectiva orientada a objetos, explorando enfoques que combinan detección y percepción espacial a partir de imágenes monoculares. Por ejemplo, en \cite{liang2022self} se propone un algoritmo basado en geometría y visión artificial que estima la distancia entre un robot y un objeto específico, alcanzando un error promedio inferior a 10 cm en entornos controlados. De forma complementaria, \cite{zhu2019monocular} introduce una arquitectura de aprendizaje profundo que fusiona detección mediante YOLOv5 y mapas de profundidad relativa obtenidos con un autoencoder, logrando una tasa de error del 5.3\% en condiciones reales al aire libre. Por otro lado, \cite{masoumian2023absolute} plantea una red de aprendizaje profundo de extremo a extremo con funciones de pérdida geométrica, que mejora la precisión en escenas complejas hasta en un 18\% respecto a métodos tradicionales. Estos trabajos, sintetizados en la Tabla \ref{tab:estimacion_distancia}, evidencian avances notables en la estimación de distancias orientada a objetos mediante visión monocular.\\
+
+Más allá de estos enfoques orientados a objetos puntuales, la visión monocular ha sido empleada extensamente en aplicaciones vehiculares. Se han desarrollado sistemas para estimación de distancia entre automóviles \cite{zhe2020distance} e incluso para múltiples objetos en carretera \cite{zhu2019objectdistance}. Sin embargo, estos estudios continúan basándose predominantemente en conjuntos de datos capturados desde vehículos, como KITTI \cite{geiger2013kitti}, lo que limita su generalización hacia escenarios peatonales o situaciones donde la cámara se encuentra a nivel del usuario y no en plataformas automotrices.\\
+
+En el ámbito del aprendizaje supervisado, también se han explorado métodos basados en secuencias temporales. Un ejemplo es DistanceNet \cite{kreuzig2019distancenet}, que emplea redes convolucionales recurrentes para estimar el desplazamiento relativo de la cámara a partir de secuencias de imágenes. Aunque estos modelos son prometedores, la estimación monocular métrica absoluta continúa enfrentando limitaciones importantes de generalización. Estudios recientes demuestran que los modelos dependen fuertemente de los parámetros intrínsecos de la cámara, la resolución y el preprocesamiento utilizado durante el entrenamiento, degradando su rendimiento cuando se evalúan en dominios ópticos diferentes \cite{koledic2023invariant}. Incluso los métodos que incorporan ajustes para obtener profundidad absoluta presentan discrepancias métricas notables bajo variaciones en la cámara de captura.\\
+
+En conjunto, la literatura evidencia progresos relevantes en la estimación de distancias a partir de visión monocular, pero también revela una brecha significativa: la necesidad de métodos que puedan operar de forma robusta en entornos dinámicos, con objetos variables, como las personas, y utilizando cámaras y recursos accesibles. El desarrollo de sistemas adaptados al dominio peatonal y sensibles a las propiedades ópticas de la cámara implica, por tanto, una oportunidad de investigación poco empleada frente a los modelos grandes y costosos que dominan actualmente.\\
+

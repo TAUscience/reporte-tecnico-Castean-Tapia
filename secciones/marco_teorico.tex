@@ -95,47 +95,39 @@ donde $(c_x,c_y)$ representa el centro de la celda y $(a_w,a_h)$ son factores de
 Tras la predicción, se aplica una etapa de post–procesado basada en \textit{Non-Maximum Suppression} (NMS) o \textit{Soft-NMS}, encargada de eliminar cajas redundantes y garantizar que el conjunto final de detecciones contenga instancias únicas y confiables.
 
 \subsubsection{Modelo de seguimiento: DeepSORT}
-El modelo de seguimiento DeepSORT integra un modelo dinámico clásico con una métrica de asociación aprendida para mejorar la robustez frente a oclusiones y cambios de apariencia \cite{wojke2017simple}. DeepSORT opera sobre el conjunto de detecciones por cuadro provistas por el detector y resuelve, en línea, la correspondencia entre detecciones y trayectorias activas (tracks) mediante una combinación de información de movimiento y de apariencia.
+El modelo de seguimiento DeepSORT integra un modelo dinámico clásico (filtro de Kalman con modelo de velocidad constante) con una métrica de asociación aprendida para mejorar la robustez frente a oclusiones y cambios de apariencia \cite{wojke2017simple}. DeepSORT opera sobre el conjunto de detecciones por cuadro provistas por el detector y resuelve, en línea, la correspondencia entre detecciones y trayectorias activas (tracks) mediante una combinación de información de movimiento y de apariencia.
 
-A nivel formal, cada track mantiene una estimación del estado dinámico del objeto modelado por un vector de estado
+A nivel formal, cada track mantiene una estimación del estado dinámico del objeto modelado por el vector de estado
 \begin{equation}
-    \mathbf{x} = \begin{bmatrix} x & y & a & h & v_x & v_y & v_a & v_h \end{bmatrix}^\top,
+    \mathbf{x} = \begin{bmatrix} x & y & a & h & v_x & v_y & v_a & v_h \end{bmatrix}^\top
 \end{equation}
-donde \(x,y\) son las coordenadas del centro de la caja, \(a\) la razón de aspecto (ancho/alto), \(h\) la altura de la caja, y \(v_x,v_y,v_a,v_h\) las correspondientes velocidades. El propósito de este espacio de estado es permitir una predicción cinemática simple (modelo de velocidad constante) y cuantificar la incertidumbre asociada a dicha predicción \cite{wojke2017simple}.
+    
+donde \(x,y\) son las coordenadas del centro de la caja, \(a\) la razón de aspecto (ancho/alto), \(h\) la altura de la caja, y \(v_x,v_y,v_a,v_h\) las correspondientes velocidades. El filtro de Kalman emplea un modelo de velocidad constante para predecir la dinámica del estado y cuantifica la incertidumbre de dicha predicción; de la predicción se obtiene la medida predicha \(\mathbf{y}_i\) para el track \(i\) y su covarianza (incertidumbre) \(S_i\).
 
-La actualización del estado se realiza mediante un filtro de Kalman lineal discreto. Denotando por \(\mathbf{x}_{k|k-1}\) y \(P_{k|k-1}\) la predicción a priori del estado y su covarianza en el instante \(k\), y por \(\mathbf{z}_k\) la observación (medición) obtenida a partir de la detección, las ecuaciones básicas son:
-\begin{align}
-    \text{Predict:}\quad & \mathbf{x}_{k|k-1} = F \mathbf{x}_{k-1|k-1},\qquad 
-    P_{k|k-1} = F P_{k-1|k-1} F^\top + Q, \\
-    \text{Update:}\quad & K_k = P_{k|k-1} H^\top (H P_{k|k-1} H^\top + R)^{-1},\\
-    & \mathbf{x}_{k|k} = \mathbf{x}_{k|k-1} + K_k(\mathbf{z}_k - H\mathbf{x}_{k|k-1}),\\
-    & P_{k|k} = (I - K_k H) P_{k|k-1},
-\end{align}
-donde \(F\) es la matriz de transición de estado, \(H\) la matriz de observación, \(Q\) y \(R\) las covarianzas de proceso y de medición respectivamente, y \(K_k\) la ganancia de Kalman. Esta formulación permite predecir la posición y tamaño esperados de cada objeto y asignar una medida de confianza (covarianza) a la predicción \cite{kalman1960new}.
-
-Para realizar la asociación entre predicciones de tracks y detecciones observadas, DeepSORT construye una matriz de costos que combina dos componentes complementarios:
+Para asociar predicciones de tracks con detecciones observadas, DeepSORT construye una matriz de costos que combina dos componentes complementarios:
 
 \begin{enumerate}
-  \item \textbf{Componente de movimiento (Mahalanobis):} mide la discrepancia entre la detección \(\mathbf{d}_j\) y la predicción del filtro de Kalman para el track \(i\), teniendo en cuenta la incertidumbre del estado. Su forma es
-  \[
-    d_{\mathrm{M}}^2(i,j) = (\mathbf{d}_j - H\mathbf{x}_{i,k|k-1})^\top S_i^{-1}(\mathbf{d}_j - H\mathbf{x}_{i,k|k-1}),
-  \]
-  donde \(S_i = H P_{i,k|k-1} H^\top + R\) es la covarianza de la predicción proyectada al espacio de medición. En la práctica se aplica un \emph{gating} estadístico: asociaciones cuyo \(d_{\mathrm{M}}^2\) excede un umbral (por ejemplo, cuantiles de la distribución \(\chi^2\)) se consideran imposibles y se descartan antes de la asignación \cite{mahalanobis1936generalised}.
-  
-  \item \textbf{Componente de apariencia (similaridad):} para cada detección se extrae un \emph{embedding} visual \(f_j\in\mathbb{R}^D\) mediante una red CNN preentrenada para re-identificación (ReID). La similitud entre el embedding de la detección y el embedding representativo del track \(i\) se evalúa típicamente mediante la distancia coseno:
-  \[
-    d_{\cos}(i,j) = 1 - \frac{f_i^\top f_j}{\lVert f_i\rVert \lVert f_j \rVert}.
-  \]
-  DeepSORT mantiene un histórico corto de embeddings por track y usa la mínima o la media de distancias sobre ese banco para robustecer la comparación frente a variaciones de vista y oclusión .
+  \item \textbf{Componente de movimiento (Mahalanobis):} mide la discrepancia entre la detección \(\mathbf{d}_j\) y la predicción del filtro de Kalman \(\mathbf{y}_i\), teniendo en cuenta la incertidumbre \(S_i\). Su forma es
+  \begin{equation}
+    d^{2}(i,j) = (\mathbf{d}_j - \mathbf{y}_{i})^\top S_i^{-1}(\mathbf{d}_j - \mathbf{y}_{i})  
+  \end{equation}
+    
+  donde \(\mathbf{d}_j\) es el vector- medición de la detección (tipicamente \([x,y,a,h]\)), \(\mathbf{y}_i\) la medición predicha para el track \(i\), y \(S_i\) la covarianza de innovación asociada a esa predicción. Intuitivamente, \(d^{2}(i,j)\) es una distancia normalizada por la incertidumbre: diferencias grandes respecto a la predicción o con baja confianza (covarianza pequeña) aumentan el costo.
+  \item \textbf{Componente de apariencia:} evalúa la similitud entre la descripción de apariencia extraída de la detección y las descripciones almacenadas para el track. Se suele usar la distancia coseno entre descriptores L2-normalizados; de modo compacto:
+  \begin{equation}
+  c_{\text{app}}(i,j) \;=\; 1 - \frac{\mathbf{f}_i^\top \mathbf{f}_j}{\|\mathbf{f}_i\|\;\|\mathbf{f}_j\|}
+  \end{equation}
+    
+  donde \(\mathbf{f}_j\) es el descriptor de la detección \(j\) y \(\mathbf{f}_i\) es el descriptor (o un promedio/galería de descriptores) asociado al track \(i\). Este término toma valores cercanos a 0 para apariencias muy similares y crece hacia 1 cuanto más diferentes son las apariencias.
 \end{enumerate}
 
-Estos dos términos se combinan en un costo total ponderado
+La matriz de costos final para la asociación suele combinar ambos términos mediante una suma ponderada:
 \begin{equation}
-    c(i,j) = \lambda \, d_{\mathrm{M}}^2(i,j) + (1-\lambda)\, d_{\cos}(i,j),
+c(i,j) \;=\; \lambda\, d^{2}(i,j) \;+\; (1-\lambda)\, c_{\text{app}}(i,j)
 \end{equation}
-con \(\lambda\in[0,1]\) controlando el balance entre la confianza en la predicción de movimiento y la evidencia visual de apariencia. La combinación lineal permite adaptar el comportamiento del tracker a distintos escenarios.
 
-Dada la matriz de costos \(C=[c(i,j)]\), la correspondencia entre \(M\) tracks y \(N\) detecciones se obtiene resolviendo un problema de asignación con costo mínimo. En la práctica DeepSORT emplea el algoritmo húngaro para obtener la asignación \(X=[x_{ij}]\) que minimiza \(\sum_{i,j} c(i,j) x_{ij}\) sujeto a restricciones de unicidad \cite{kuhn1955hungarian}. Para mejorar la robustez en presencia de tracks con distintas edades, DeepSORT aplica una \emph{matching cascade} que procesa primero tracks recientemente actualizados y deja para etapas posteriores los tracks más antiguos, reduciendo así los cambios de identidad (ID switches) en ventanas temporales con oclusiones parciales \cite{wojke2017simple}.
+con \(\lambda\in[0,1]\) un parámetro que controla la importancia relativa de la dinámica frente a la apariencia. Antes de resolver la asignación, DeepSORT aplica una \emph{puerta} (gating) basada en la distancia Mahalanobis: si \(d^{2}(i,j)\) excede un umbral estadístico (derivado de la distribución para el tamaño de la medición) la asociación se considera inviable y se descarta. Finalmente, sobre las asociaciones viables se resuelve el problema de asignación óptima, y las coincidencias resultantes actualizan los filtros de Kalman de cada track (paso de corrección) mientras que las no emparejadas crean nuevas trayectorias o actualizan el estado de tracks sin observación.
+
 
 \subsection{Redes Neuronales Recurrentes}
 
